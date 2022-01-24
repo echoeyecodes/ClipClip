@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ClipClip</string>
+    <string name="welcome_text">Hello! Please answer the following series of question to properly determine the fault with your automobile vehicle😊 Press start to begin!</string>
+    <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque elementum velit ut velit suscipit tristique. Sed a porttitor ipsum. Ut vitae viverra lorem.</string>
+</resources>
