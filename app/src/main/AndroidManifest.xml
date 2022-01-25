@@ -25,6 +25,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.echoeyecodes.clipclip.activities.VideoActivity" />
+        <activity android:name=".activities.VideoSplitActivity" />
 
     </application>
 

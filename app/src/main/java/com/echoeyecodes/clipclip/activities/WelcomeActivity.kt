@@ -1,6 +1,7 @@
 package com.echoeyecodes.clipclip.activities
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -9,10 +10,12 @@ import com.echoeyecodes.clipclip.databinding.ActivityWelcomeBinding
 import com.echoeyecodes.clipclip.utils.AndroidUtilities
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.documentfile.provider.DocumentFile
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,7 +37,6 @@ class WelcomeActivity : AppCompatActivity(), VideoAdapterCallback {
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
     private val viewModel by lazy { ViewModelProvider(this)[VideoSelectionActivityViewModel::class.java] }
-    var selectedUrl: Uri? = null
 
     companion object {
         const val CREATE_FILE = 1
@@ -80,12 +82,17 @@ class WelcomeActivity : AppCompatActivity(), VideoAdapterCallback {
     }
 
     private fun executeVideoEdit(path: Uri) {
-        val iUri = FFmpegKitConfig.getSafParameterForRead(this, selectedUrl!!)
-        val uri = FFmpegKitConfig.getSafParameterForWrite(this, path)
+        val iUri = FFmpegKitConfig.getSafParameterForRead(this, Uri.parse("selectedUrl!!"))
+        val oUri = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+            FFmpegKitConfig.getSafParameterForWrite(this, path)
+        } else {
+            path
+        }
+        AndroidUtilities.log(oUri.toString())
 
         try {
             FFmpegKit.executeAsync(
-                "-i $iUri -c:v mpeg4 $uri",
+                "-i $iUri -c:v mpeg4 $oUri",
                 { session ->
                     AndroidUtilities.log("FFMPEG process exited with state ${session.state} and return code ${session.returnCode}")
                     val returnCode = session.returnCode
@@ -101,6 +108,7 @@ class WelcomeActivity : AppCompatActivity(), VideoAdapterCallback {
                 }) {
                 //executes repeatedly
 //            val progress = (time / videoduration) * 100
+                AndroidUtilities.log(it.time.toString())
             }
         } catch (exception: Exception) {
             AndroidUtilities.log("An unknown exception occurred")
@@ -108,42 +116,51 @@ class WelcomeActivity : AppCompatActivity(), VideoAdapterCallback {
     }
 
     override fun onVideoSelected(model: VideoModel) {
-        selectedUrl = model.getVideoUri()
-        ActivityUtil.startVideoActivity(this, selectedUrl!!.toString(), model.duration)
-//        allowAccessToFolder()
+        val selectedUrl = model.getVideoUri()
+        AndroidUtilities.log(selectedUrl.toString())
+        ActivityUtil.startVideoActivity(this, selectedUrl.toString(), model.duration)
     }
 
-    private fun createFile() {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "video/mp4"
-            putExtra(Intent.EXTRA_TITLE, "video.mp4")
+    private fun createFile(filename: String): Uri? {
+        val contentValues = ContentValues()
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "")
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            contentValues.put(
+                MediaStore.MediaColumns.RELATIVE_PATH,
+                Environment.DIRECTORY_DCIM.plus("/").plus(getString(R.string.app_name))
+            )
+            contentValues.put(
+                MediaStore.MediaColumns.DISPLAY_NAME,
+                filename.plus("_${System.currentTimeMillis()}")
+            )
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
+            contentResolver.insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, contentValues)
+        } else {
+            createFileLegacy(filename)
         }
-        startActivityForResult(intent, CREATE_FILE)
     }
 
-    private fun allowAccessToFolder() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-        startActivityForResult(intent, ACCESS_FOLDER)
-    }
-
-    private fun createFileFromDocument(documentUri: Uri): Uri? {
-        val documentFile = DocumentFile.fromTreeUri(this, documentUri) ?: return null
-        val file = documentFile.createFile("video/mp4", "jasdsad.mp4")
-        return file?.uri
-    }
-
-    private fun getLegacyFilePath(filename: String): File {
-        val file =
-            File(Environment.getExternalStorageDirectory(), getString(R.string.app_name)).apply {
-                if (!exists()) {
-                    mkdir()
-                }
-            }
-        return File(file, filename).apply {
+    private fun createFileLegacy(filename: String): Uri {
+        val file = File(Environment.getExternalStorageDirectory(), getString(R.string.app_name))
+        if (!file.exists()) {
+            file.mkdir()
+        }
+        return File(file, filename.plus(".mp4")).apply {
             if (exists()) {
                 delete()
             }
+        }.absolutePath.toUri()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        val granted = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+        if (granted) {
+            viewModel.fetchVideosFromFileSystem()
         }
     }
 
@@ -153,11 +170,6 @@ class WelcomeActivity : AppCompatActivity(), VideoAdapterCallback {
         if (requestCode == CREATE_FILE && resultCode == RESULT_OK) {
             if (result != null) {
                 executeVideoEdit(result.data!!)
-            }
-        } else if (requestCode == ACCESS_FOLDER && resultCode == RESULT_OK) {
-            result?.data?.let {
-                val uri = createFileFromDocument(it)
-                executeVideoEdit(uri!!)
             }
         }
     }
