@@ -9,7 +9,7 @@ import com.bumptech.glide.Glide
 import com.echoeyecodes.clipclip.R
 import com.echoeyecodes.clipclip.callbacks.VideoAdapterCallback
 import com.echoeyecodes.clipclip.databinding.LayoutVideoItemBinding
-import com.echoeyecodes.clipclip.model.VideoModel
+import com.echoeyecodes.clipclip.models.VideoModel
 import com.echoeyecodes.clipclip.utils.VideoModelItemCallback
 
 class VideoAdapter(private val callback: VideoAdapterCallback) :

@@ -6,11 +6,14 @@ import android.os.Handler
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.echoeyecodes.clipclip.callbacks.VideoConfigurationCallback
 import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionCallback
 import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionGravity
 import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionView
 import com.echoeyecodes.clipclip.databinding.ActivityVideoSelectionBinding
+import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoConfigurationDialogFragment
 import com.echoeyecodes.clipclip.utils.ActivityUtil
+import com.echoeyecodes.clipclip.utils.AndroidUtilities
 import com.echoeyecodes.clipclip.viewmodels.VideoActivityViewModel
 import com.echoeyecodes.clipclip.viewmodels.VideoActivityViewModelFactory
 import com.google.android.exoplayer2.ExoPlayer
@@ -20,7 +23,8 @@ import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.button.MaterialButton
 
-class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listener {
+class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listener,
+    VideoConfigurationCallback {
     private val binding by lazy { ActivityVideoSelectionBinding.inflate(layoutInflater) }
     private lateinit var textView: TextView
     private lateinit var timestamp: TextView
@@ -30,6 +34,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     private var player: ExoPlayer? = null
     private lateinit var playerView: PlayerView
     private lateinit var viewModel: VideoActivityViewModel
+    private lateinit var videoConfigurationDialogFragment: VideoConfigurationDialogFragment
     private val handler by lazy { Handler(mainLooper) }
 
     private val playerRunnable = object : Runnable {
@@ -52,6 +57,11 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
 
         val viewModelFactory = VideoActivityViewModelFactory(duration, this)
         viewModel = ViewModelProvider(this, viewModelFactory)[VideoActivityViewModel::class.java]
+        videoConfigurationDialogFragment =
+            (supportFragmentManager.findFragmentByTag(VideoConfigurationDialogFragment.TAG) as VideoConfigurationDialogFragment?)
+                ?: VideoConfigurationDialogFragment.newInstance().apply {
+                    this.videoConfigurationCallback = this@VideoActivity
+                }
 
         videoSelectionView = binding.videoSelection.apply {
             selectionCallback = this@VideoActivity
@@ -78,15 +88,11 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         val positions = viewModel.getMarkerPositions()
         videoSelectionView.updateMarkerPosition(positions.first, positions.second)
 
-        doneBtn.setOnClickListener {
-            val uri = intent.getStringExtra("uri")!!
-            ActivityUtil.startVideoSplitActivity(
-                this,
-                uri,
-                viewModel.getStartTime(),
-                viewModel.getEndTime()
-            )
-        }
+        doneBtn.setOnClickListener { showConfigurationDialog() }
+    }
+
+    private fun showConfigurationDialog() {
+        AndroidUtilities.showFragment(supportFragmentManager, videoConfigurationDialogFragment)
     }
 
     private fun playVideo() {
@@ -208,5 +214,15 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
                 it.pause()
             }
         }
+    }
+
+    override fun onFinish() {
+        val uri = intent.getStringExtra("uri")!!
+        ActivityUtil.startVideoSplitActivity(
+            this,
+            uri,
+            viewModel.getStartTime(),
+            viewModel.getEndTime()
+        )
     }
 }

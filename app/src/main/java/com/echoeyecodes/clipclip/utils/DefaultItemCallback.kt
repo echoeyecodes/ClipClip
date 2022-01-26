@@ -1,7 +1,7 @@
 package com.echoeyecodes.clipclip.utils
 
 import androidx.recyclerview.widget.DiffUtil
-import com.echoeyecodes.clipclip.model.VideoModel
+import com.echoeyecodes.clipclip.models.VideoModel
 
 class DefaultItemCallback : DiffUtil.ItemCallback<String>() {
     override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {

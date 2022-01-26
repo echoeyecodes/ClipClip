@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.echoeyecodes.clipclip.adapters.VideoAdapter
 import com.echoeyecodes.clipclip.callbacks.VideoAdapterCallback
-import com.echoeyecodes.clipclip.model.VideoModel
+import com.echoeyecodes.clipclip.models.VideoModel
 import com.echoeyecodes.clipclip.utils.ActivityUtil
 import com.echoeyecodes.clipclip.utils.CustomItemDecoration
 import com.echoeyecodes.clipclip.viewmodels.VideoSelectionActivityViewModel

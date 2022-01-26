@@ -1,4 +1,4 @@
-package com.echoeyecodes.clipclip.model
+package com.echoeyecodes.clipclip.models
 
 import android.content.ContentUris
 import android.net.Uri

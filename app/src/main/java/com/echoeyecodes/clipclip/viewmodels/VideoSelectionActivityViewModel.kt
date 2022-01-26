@@ -6,7 +6,7 @@ import android.provider.MediaStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.echoeyecodes.clipclip.model.VideoModel
+import com.echoeyecodes.clipclip.models.VideoModel
 
 class VideoSelectionActivityViewModel(application: Application) : AndroidViewModel(application) {
     private val videoData = MutableLiveData<List<VideoModel>>(ArrayList())

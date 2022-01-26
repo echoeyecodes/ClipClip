@@ -1,6 +1,6 @@
 package com.echoeyecodes.clipclip.callbacks
 
-import com.echoeyecodes.clipclip.model.VideoModel
+import com.echoeyecodes.clipclip.models.VideoModel
 
 interface VideoAdapterCallback {
     fun onVideoSelected(model: VideoModel)
