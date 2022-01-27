@@ -3,6 +3,7 @@ package com.echoeyecodes.clipclip.customviews.videoselectionview
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.ViewGroup
 import com.echoeyecodes.clipclip.utils.convertToDp
 
@@ -17,6 +18,8 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
     private var selectionRectF = RectF()
     var selectionCallback: VideoSelectionCallback? = null
 
+    private var thumbX = 0f
+
     init {
         setWillNotDraw(false)
         val thumbOne = VideoSelectionMarkerView(context, attributeSet).apply {
@@ -29,6 +32,9 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
 
         addView(thumbOne)
         addView(thumbTwo)
+        post {
+            setXCoordinates(0f, (width - thumbWidth).toFloat())
+        }
     }
 
     fun setXCoordinates(startX: Float, endX: Float) {
@@ -55,9 +61,40 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
         canvas.drawRect(selectionRectF, selectionPaint)
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        setXCoordinates(0f, (w - thumbWidth).toFloat())
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        val _x = event.rawX
+
+        return when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                thumbX = startX - _x
+                true
+            }
+            MotionEvent.ACTION_MOVE -> {
+                val thumb1 = getChildAt(0) as VideoSelectionMarkerView
+                val thumb2 = getChildAt(1) as VideoSelectionMarkerView
+
+                val newStartX = _x + thumbX
+                val newEndX = this.endX + (newStartX - this.startX)
+
+                if (newStartX >= 0 && newEndX < (width - thumbWidth).toFloat()) {
+                    onMarkerSelected(VideoSelectionGravity.LEFT)
+                    thumb1.selectMarkerPosition(newStartX)
+                    thumb2.selectMarkerPosition(newEndX)
+                }
+                true
+            }
+            MotionEvent.ACTION_UP -> {
+                if (isBetweenCoordinates(_x)) {
+                    onMarkerReleased(VideoSelectionGravity.LEFT)
+                }
+                true
+            }
+            else -> false
+        }
+    }
+
+    private fun isBetweenCoordinates(value: Float): Boolean {
+        return value in startX..endX
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
