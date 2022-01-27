@@ -84,7 +84,7 @@ dependencies {
     kapt "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
     implementation "androidx.fragment:fragment-ktx:1.4.0"
 
-    implementation 'com.arthenica:ffmpeg-kit-full:4.5.1'
+    implementation 'com.arthenica:ffmpeg-kit-full-gpl:4.5.1'
 
     implementation "com.google.android.exoplayer:exoplayer-core:$exo_version"
     implementation "com.google.android.exoplayer:exoplayer-dash:$exo_version"

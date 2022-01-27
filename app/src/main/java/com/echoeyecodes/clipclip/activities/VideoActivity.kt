@@ -12,8 +12,11 @@ import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionGr
 import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionView
 import com.echoeyecodes.clipclip.databinding.ActivityVideoSelectionBinding
 import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoConfigurationDialogFragment
+import com.echoeyecodes.clipclip.models.VideoConfigModel
 import com.echoeyecodes.clipclip.utils.ActivityUtil
 import com.echoeyecodes.clipclip.utils.AndroidUtilities
+import com.echoeyecodes.clipclip.utils.VideoFormat
+import com.echoeyecodes.clipclip.utils.VideoQuality
 import com.echoeyecodes.clipclip.viewmodels.VideoActivityViewModel
 import com.echoeyecodes.clipclip.viewmodels.VideoActivityViewModelFactory
 import com.google.android.exoplayer2.ExoPlayer
@@ -216,13 +219,19 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         }
     }
 
-    override fun onFinish() {
+    override fun onFinish(splitTime: Int, quality: VideoQuality, format: VideoFormat) {
         val uri = intent.getStringExtra("uri")!!
+
         ActivityUtil.startVideoSplitActivity(
             this,
             uri,
-            viewModel.getStartTime(),
-            viewModel.getEndTime()
+            VideoConfigModel(
+                viewModel.getStartTime(),
+                viewModel.getEndTime(),
+                splitTime,
+                format,
+                quality
+            )
         )
     }
 }

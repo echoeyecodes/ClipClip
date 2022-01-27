@@ -6,7 +6,7 @@ enum class VideoQuality(name: String) {
     HIGH("high")
 }
 
-enum class VideoFormat(name: String) {
+enum class VideoFormat(val extension: String) {
     MP4(".mp4"),
     MP3(".mp3")
 }

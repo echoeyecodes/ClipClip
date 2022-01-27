@@ -67,7 +67,13 @@ class VideoConfigurationDialogFragment : BaseDialogFragment(), SeekBar.OnSeekBar
         seekBarText = binding.seekBarText
         chipGroup = binding.formatChipGroup
 
-        doneBtn.setOnClickListener { videoConfigurationCallback?.onFinish() }
+        doneBtn.setOnClickListener {
+            videoConfigurationCallback?.onFinish(
+                viewModel.splitTime,
+                viewModel.quality,
+                viewModel.format
+            )
+        }
 
         seekbar.setOnSeekBarChangeListener(this)
         chipGroup.setOnCheckedChangeListener { group, checkedId ->

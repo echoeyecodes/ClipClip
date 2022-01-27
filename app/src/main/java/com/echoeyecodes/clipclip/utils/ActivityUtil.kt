@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import com.echoeyecodes.clipclip.activities.VideoActivity
 import com.echoeyecodes.clipclip.activities.VideoSplitActivity
+import com.echoeyecodes.clipclip.models.VideoConfigModel
 
 class ActivityUtil {
 
@@ -18,13 +19,11 @@ class ActivityUtil {
         fun startVideoSplitActivity(
             context: Context,
             videoUri: String,
-            startTime: Long,
-            endTime: Long
+            videoConfigModel: VideoConfigModel
         ) {
             context.startActivity(Intent(context, VideoSplitActivity::class.java).apply {
+                putExtra("videoConfig", videoConfigModel)
                 putExtra("videoUri", videoUri)
-                putExtra("startTime", startTime)
-                putExtra("endTime", endTime)
             })
         }
     }

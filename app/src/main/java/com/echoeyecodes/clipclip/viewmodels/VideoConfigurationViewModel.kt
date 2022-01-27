@@ -9,5 +9,4 @@ class VideoConfigurationViewModel(application: Application):AndroidViewModel(app
     var splitTime = 30
     var quality = VideoQuality.HIGH
     var format = VideoFormat.MP4
-
 }

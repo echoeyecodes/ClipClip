@@ -290,3 +290,13 @@ fun String.withPrefix(): String {
         )
     )
 }
+
+fun Int.formatTimeToDigits(): String {
+    val minutes = "0".plus(this / 60)
+    val seconds = "0".plus(this % 60)
+    return "${minutes.withPrefix()}:${seconds.withPrefix()}"
+}
+
+fun Long.toSeconds():Int{
+    return (this.toFloat() / 1000).toInt()
+}
