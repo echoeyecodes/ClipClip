@@ -63,8 +63,10 @@ class VideoSelectionMarkerView(context: Context, attr: AttributeSet) :
         val parentView = (parent as VideoSelectionView)
         val maxWidth = (parentView.width - width).toFloat()
         return if (gravity == VideoSelectionGravity.RIGHT) {
-            //allow to overlap first thumb to obtain at least a 0.0 percentage
-            max(parentView.getBound(gravity), max(0f, min(position, maxWidth)))
+            max(
+                parentView.getBound(gravity) + parentView.thumbWidth,
+                max(0f, min(position, maxWidth))
+            )
         } else {
             min(parentView.getBound(gravity) - width, max(0f, min(position, maxWidth)))
         }

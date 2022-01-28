@@ -137,10 +137,10 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
 
     private fun determineSelectionRange(x1: Float, x2: Float): Pair<Float, Float> {
         val offset = thumbWidth
-        val selectionWidth = width - offset
+        val selectionWidth = width - (2 * offset)
 
         val _x1 = (x1 / selectionWidth) * 100
-        val _x2 = (x2 / selectionWidth) * 100
+        val _x2 = ((x2 - offset) / selectionWidth) * 100
         return Pair(_x1, _x2)
     }
 
