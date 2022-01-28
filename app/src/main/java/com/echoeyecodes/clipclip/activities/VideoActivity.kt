@@ -5,8 +5,10 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.arthenica.ffmpegkit.FFmpegKitConfig
@@ -38,6 +40,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     private val binding by lazy { ActivityVideoSelectionBinding.inflate(layoutInflater) }
     private lateinit var textView: TextView
     private lateinit var timestamp: TextView
+    private lateinit var bufferProgressContainer: View
     private lateinit var durationTextView: TextView
     private lateinit var doneBtn: MaterialButton
     private lateinit var videoSelectionView: VideoSelectionView
@@ -62,6 +65,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         timestamp = binding.timestamp
         playerView = binding.playerView
         doneBtn = binding.doneBtn
+        bufferProgressContainer = binding.bufferProgressContainer
         durationTextView = binding.totalDuration
 
         val duration = intent.getLongExtra("duration", 0L)
@@ -223,6 +227,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
 
     override fun onPlaybackStateChanged(playbackState: Int) {
         super.onPlaybackStateChanged(playbackState)
+        bufferProgressContainer.isVisible = playbackState == ExoPlayer.STATE_BUFFERING
         when (playbackState) {
             ExoPlayer.STATE_READY -> {
 //                val duration = player?.duration ?: 0

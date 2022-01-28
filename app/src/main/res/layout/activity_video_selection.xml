@@ -35,16 +35,15 @@
 
         <TextView
             android:id="@+id/total_duration"
+            style="@style/Regular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="00:00"
-            style="@style/Regular"
-            android:background="@drawable/drawable_text_overlay"
-            android:textSize="14sp"
-            android:textColor="@color/white"
-            android:paddingHorizontal="5dp"
             android:layout_marginStart="30dp"
-            />
+            android:background="@drawable/drawable_text_overlay"
+            android:paddingHorizontal="5dp"
+            android:text="00:00"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
 
     </LinearLayout>
 
@@ -61,8 +60,24 @@
         android:id="@+id/done_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Done"
         android:layout_gravity="bottom|center_horizontal"
-        />
+        android:text="Done" />
+
+    <RelativeLayout
+        android:id="@+id/buffer_progress_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/overlay"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        android:elevation="199dp">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:indeterminate="true" />
+    </RelativeLayout>
 
 </FrameLayout>
