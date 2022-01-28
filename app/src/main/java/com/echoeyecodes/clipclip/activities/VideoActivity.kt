@@ -21,10 +21,7 @@ import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoConfigurationDia
 import com.echoeyecodes.clipclip.models.VideoConfigModel
 import com.echoeyecodes.clipclip.services.VideoTrimService
 import com.echoeyecodes.clipclip.trimmer.VideoTrimManager
-import com.echoeyecodes.clipclip.utils.ActivityUtil
-import com.echoeyecodes.clipclip.utils.AndroidUtilities
-import com.echoeyecodes.clipclip.utils.VideoFormat
-import com.echoeyecodes.clipclip.utils.VideoQuality
+import com.echoeyecodes.clipclip.utils.*
 import com.echoeyecodes.clipclip.viewmodels.VideoActivityViewModel
 import com.echoeyecodes.clipclip.viewmodels.VideoActivityViewModelFactory
 import com.google.android.exoplayer2.ExoPlayer
@@ -112,8 +109,11 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
 
     private fun initFFMPEGListener() {
         FFmpegKitConfig.enableStatisticsCallback {
-            val duration = viewModel.getTimeDifference()
-            val progress = String.format("%.2f", ((it.time / duration.toFloat()) * 100))
+            val duration = viewModel.getTotalDurationByIndex()
+            val progress = String.format(
+                "%.2f",
+                ((it.time.toFloat() / 1000.toFloat() / duration.toFloat()) * 100)
+            )
             runOnUiThread {
                 progressDialogFragment.setProgressTitle(
                     viewModel.trimProgress.first,
@@ -259,6 +259,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             format,
             quality
         )
+        viewModel.splitTime = splitTime
         AndroidUtilities.dismissFragment(videoConfigurationDialogFragment)
         val serviceIntent = Intent(this, VideoTrimService::class.java).apply {
             putExtra("videoConfig", configModel)

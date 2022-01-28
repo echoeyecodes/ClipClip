@@ -3,6 +3,7 @@ package com.echoeyecodes.clipclip.viewmodels
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.*
+import com.echoeyecodes.clipclip.utils.toSeconds
 import com.echoeyecodes.clipclip.utils.withPrefix
 import kotlin.math.max
 
@@ -25,6 +26,7 @@ class VideoActivityViewModel(private val duration: Long, application: Applicatio
     private val timestampDifferenceLiveData = MutableLiveData("00:00")
     var currentPosition = 0L
     var trimProgress = Pair(0, 0)
+    var splitTime = 1
 
     init {
         setVideoTimestamps(0f, 100f)
@@ -35,6 +37,19 @@ class VideoActivityViewModel(private val duration: Long, application: Applicatio
         val end = (endTime.toFloat() / duration.toFloat())
 
         return Pair(start, end)
+    }
+
+    /*
+        Get the total duration for the current video trim cut
+     */
+    fun getTotalDurationByIndex(): Int {
+        val index = (trimProgress.first - 1)
+        val start = (startTime.toSeconds() + (index * splitTime))
+        return if ((endTime.toSeconds() - start) < splitTime) {
+            endTime.toSeconds() - start
+        } else {
+            splitTime
+        }
     }
 
     fun setVideoTimestamps(startX: Float, endX: Float) {
