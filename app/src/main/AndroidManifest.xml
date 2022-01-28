@@ -16,6 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.BookTweet">
+        <receiver android:name=".receivers.VideoTrimBroadcastReceiver" android:exported="true" />
         <service android:name=".services.VideoTrimService" />
         <activity
             android:name="com.echoeyecodes.clipclip.activities.WelcomeActivity"

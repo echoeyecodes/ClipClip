@@ -20,6 +20,7 @@ import java.io.File
 
 class VideoTrimManager(private val context: Context) {
     private val callbacks = ArrayList<VideoTrimCallback>()
+    var shouldTerminate = false
 
     fun addTrimCallback(callback: VideoTrimCallback) {
         this.callbacks.add(callback)
@@ -35,7 +36,12 @@ class VideoTrimManager(private val context: Context) {
         }
     }
 
+    private fun resetTerminate(){
+        shouldTerminate = false
+    }
+
     suspend fun startTrim(videoUri: String, configModel: VideoConfigModel) {
+        resetTerminate()
         val count = configModel.getSplitCount()
         val format = if (configModel.format == VideoFormat.MP3) {
             " -q:a 0 -map a "
@@ -55,6 +61,9 @@ class VideoTrimManager(private val context: Context) {
         }
 
         for (i in 0 until count) {
+            if (shouldTerminate) {
+                break
+            }
             callbacks.forEach { it.onTrimStarted(i + 1, count) }
             val start = (configModel.startTime.toSeconds() + (i * configModel.splitTime))
 
@@ -73,7 +82,13 @@ class VideoTrimManager(private val context: Context) {
                     context.getString(R.string.app_name).plus(i),
                     configModel.format.extension
                 )?.let {
-                    executeVideoEdit(videoUri.toUri(), it, commandString, "-ss ${start.formatTimeToDigits()}", "-t ${splitTime.formatTimeToDigits()}")
+                    executeVideoEdit(
+                        videoUri.toUri(),
+                        it,
+                        commandString,
+                        "-ss ${start.formatTimeToDigits()}",
+                        "-t ${splitTime.formatTimeToDigits()}"
+                    )
                 }
             }
         }
@@ -126,7 +141,13 @@ class VideoTrimManager(private val context: Context) {
         }.absolutePath.toUri()
     }
 
-    private suspend fun executeVideoEdit(videoUri: Uri, path: Uri, commandString: String, startTime:String, splitTime:String) {
+    private suspend fun executeVideoEdit(
+        videoUri: Uri,
+        path: Uri,
+        commandString: String,
+        startTime: String,
+        splitTime: String
+    ) {
         val iUri = FFmpegKitConfig.getSafParameterForRead(context, videoUri)
         val oUri = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
             FFmpegKitConfig.getSafParameterForWrite(context, path)
