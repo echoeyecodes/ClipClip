@@ -54,9 +54,10 @@ class VideoActivityViewModel(private val duration: Long, application: Applicatio
 
     private fun formatTimestamp(value: Long): String {
         val totalSeconds = value / 1000
-        val minutes = "0".plus(totalSeconds / 60)
-        val seconds = "0".plus(totalSeconds % 60)
-        return "${minutes.withPrefix()}:${seconds.withPrefix()}"
+        val hours = "0".plus(totalSeconds/60/60)
+        val minutes = "0".plus((totalSeconds/ 60 % 60))
+        val seconds = "0".plus((totalSeconds%60%60)%60)
+        return "${hours.withPrefix()}:${minutes.withPrefix()}:${seconds.withPrefix()}"
     }
 
     fun getTimestampLiveData(): LiveData<String> {
