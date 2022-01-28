@@ -292,11 +292,13 @@ fun String.withPrefix(): String {
 }
 
 fun Int.formatTimeToDigits(): String {
-    val minutes = "0".plus(this / 60)
-    val seconds = "0".plus(this % 60)
-    return "${minutes.withPrefix()}:${seconds.withPrefix()}"
+    val totalSeconds = this
+    val hours = "0".plus(totalSeconds / 60 / 60)
+    val minutes = "0".plus((totalSeconds / 60 % 60))
+    val seconds = "0".plus((totalSeconds % 60 % 60) % 60)
+    return "${hours.withPrefix()}:${minutes.withPrefix()}:${seconds.withPrefix()}"
 }
 
-fun Long.toSeconds():Int{
+fun Long.toSeconds(): Int {
     return (this.toFloat() / 1000).toInt()
 }

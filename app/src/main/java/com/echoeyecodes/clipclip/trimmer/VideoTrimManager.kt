@@ -36,7 +36,7 @@ class VideoTrimManager(private val context: Context) {
         }
     }
 
-    private fun resetTerminate(){
+    private fun resetTerminate() {
         shouldTerminate = false
     }
 
@@ -170,6 +170,7 @@ class VideoTrimManager(private val context: Context) {
                 }
                 //operation successfull
             } else {
+                shouldTerminate = true
                 AndroidUtilities.log("Failed")
                 //operation failed
             }
