@@ -150,7 +150,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             val mediaItem = MediaItem.fromUri(uri)
             it.setMediaItem(mediaItem)
             it.seekTo(viewModel.currentPosition)
-            it.playWhenReady = true
+            it.playWhenReady = viewModel.isPlaying
             it.prepare()
             it.addListener(this)
         }
@@ -188,7 +188,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
 
     private fun releasePlayer() {
         player?.run {
-            playWhenReady = this.playWhenReady
+            viewModel.isPlaying = this.isPlaying
             viewModel.currentPosition = this.currentPosition
             this.removeListener(this@VideoActivity)
             release()
