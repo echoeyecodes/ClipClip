@@ -26,6 +26,7 @@ import com.echoeyecodes.clipclip.viewmodels.VideoActivityViewModel
 import com.echoeyecodes.clipclip.viewmodels.VideoActivityViewModelFactory
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.Util
@@ -270,6 +271,11 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         } else {
             startService(serviceIntent)
         }
+    }
+
+    override fun onPlayerError(error: PlaybackException) {
+        super.onPlayerError(error)
+        AndroidUtilities.showSnackBar(playerView, "Could not play this video")
     }
 
     override fun onTrimStarted(index: Int, total: Int) {
