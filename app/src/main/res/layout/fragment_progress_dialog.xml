@@ -8,10 +8,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:gravity="center"
         android:orientation="horizontal"
         android:paddingHorizontal="10dp"
-        android:paddingVertical="20dp">
+        android:paddingTop="20dp"
+        android:paddingBottom="10dp"
+        >
 
         <ProgressBar
             android:layout_width="wrap_content"
@@ -36,6 +37,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Current Progress: 0.0%" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancel_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancel"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_gravity="end"
+                android:layout_marginTop="10dp"
+                />
 
         </LinearLayout>
     </LinearLayout>

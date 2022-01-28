@@ -1,15 +1,18 @@
 package com.echoeyecodes.clipclip.fragments.dialogfragments
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.echoeyecodes.clipclip.R
+import com.echoeyecodes.clipclip.services.VideoTrimService
 
 class ProgressDialogFragment : BaseDialogFragment() {
 
+    private lateinit var cancelBtn: View
     private lateinit var progressTitleTextView: TextView
     private lateinit var progressTextView: TextView
 
@@ -43,8 +46,15 @@ class ProgressDialogFragment : BaseDialogFragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_progress_dialog, container, false)
         progressTextView = view.findViewById(R.id.progress_description)
+        cancelBtn = view.findViewById(R.id.cancel_btn)
         progressTitleTextView = view.findViewById(R.id.progress_title)
+
+        cancelBtn.setOnClickListener { terminateService() }
         return view
+    }
+
+    private fun terminateService() {
+        requireContext().stopService(Intent(context, VideoTrimService::class.java))
     }
 
     @SuppressLint("SetTextI18n")
@@ -55,7 +65,7 @@ class ProgressDialogFragment : BaseDialogFragment() {
     }
 
     @SuppressLint("SetTextI18n")
-    fun setProgressTitle(index: Int, total:Int) {
+    fun setProgressTitle(index: Int, total: Int) {
         if (isVisible) {
             progressTitleTextView.text = "Trimming Video ($index of $total)"
         }
