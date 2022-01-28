@@ -24,7 +24,7 @@ class VideoActivityViewModel(private val duration: Long, application: Applicatio
     private val timestampLiveData = MutableLiveData("00:00 - 00:00")
     private val timestampDifferenceLiveData = MutableLiveData("00:00")
     var currentPosition = 0L
-    var trimProgress = Pair(0,0)
+    var trimProgress = Pair(0, 0)
 
     init {
         setVideoTimestamps(0f, 100f)
@@ -54,9 +54,9 @@ class VideoActivityViewModel(private val duration: Long, application: Applicatio
 
     private fun formatTimestamp(value: Long): String {
         val totalSeconds = value / 1000
-        val hours = "0".plus(totalSeconds/60/60)
-        val minutes = "0".plus((totalSeconds/ 60 % 60))
-        val seconds = "0".plus((totalSeconds%60%60)%60)
+        val hours = "0".plus(totalSeconds / 60 / 60)
+        val minutes = "0".plus((totalSeconds / 60 % 60))
+        val seconds = "0".plus((totalSeconds % 60 % 60) % 60)
         return "${hours.withPrefix()}:${minutes.withPrefix()}:${seconds.withPrefix()}"
     }
 
