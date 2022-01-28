@@ -108,8 +108,6 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         videoSelectionView.updateMarkerPosition(positions.first, positions.second)
 
         doneBtn.setOnClickListener { showConfigurationDialog() }
-
-        initFFMPEGListener()
     }
 
     private fun initFFMPEGListener() {
@@ -167,6 +165,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
 
     public override fun onResume() {
         super.onResume()
+        initFFMPEGListener()
         if ((Util.SDK_INT < 24 || player == null)) {
             initPlayer()
         }
