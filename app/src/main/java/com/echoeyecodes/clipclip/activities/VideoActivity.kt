@@ -8,6 +8,7 @@ import android.os.Handler
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.echoeyecodes.clipclip.callbacks.VideoConfigurationCallback
 import com.echoeyecodes.clipclip.callbacks.VideoTrimCallback
@@ -281,7 +282,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     }
 
     override fun onTrimEnded() {
-        runOnUiThread {
+        lifecycleScope.launchWhenResumed {
             AndroidUtilities.dismissFragment(progressDialogFragment)
         }
     }

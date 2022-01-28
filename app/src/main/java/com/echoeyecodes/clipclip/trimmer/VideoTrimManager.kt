@@ -65,8 +65,7 @@ class VideoTrimManager(private val context: Context) {
             }
 
             if (configModel.splitTime + start < configModel.endTime) {
-                val commandString =
-                    " -t ${splitTime.formatTimeToDigits()} -ss ${start.formatTimeToDigits()} $format"
+                val commandString = format
                 if (start >= configModel.endTime.toSeconds()) {
                     break
                 }
@@ -74,7 +73,7 @@ class VideoTrimManager(private val context: Context) {
                     context.getString(R.string.app_name).plus(i),
                     configModel.format.extension
                 )?.let {
-                    executeVideoEdit(videoUri.toUri(), it, commandString)
+                    executeVideoEdit(videoUri.toUri(), it, commandString, "-ss ${start.formatTimeToDigits()}", "-t ${splitTime.formatTimeToDigits()}")
                 }
             }
         }
@@ -127,7 +126,7 @@ class VideoTrimManager(private val context: Context) {
         }.absolutePath.toUri()
     }
 
-    private suspend fun executeVideoEdit(videoUri: Uri, path: Uri, commandString: String) {
+    private suspend fun executeVideoEdit(videoUri: Uri, path: Uri, commandString: String, startTime:String, splitTime:String) {
         val iUri = FFmpegKitConfig.getSafParameterForRead(context, videoUri)
         val oUri = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
             FFmpegKitConfig.getSafParameterForWrite(context, path)
@@ -137,8 +136,7 @@ class VideoTrimManager(private val context: Context) {
         AndroidUtilities.log(oUri.toString())
 
         try {
-            val session =
-                FFmpegKit.execute("-i $iUri $commandString $oUri")
+            val session = FFmpegKit.execute(" $startTime -i $iUri $splitTime $commandString $oUri")
             AndroidUtilities.log("FFMPEG process exited with state ${session.state} and return code ${session.returnCode}")
             val returnCode = session.returnCode
             if (ReturnCode.isSuccess(returnCode)) {
