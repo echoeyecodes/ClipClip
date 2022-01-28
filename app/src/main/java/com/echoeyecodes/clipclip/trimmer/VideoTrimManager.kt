@@ -36,8 +36,6 @@ class VideoTrimManager(private val context: Context) {
     }
 
     suspend fun startTrim(videoUri: String, configModel: VideoConfigModel) {
-        AndroidUtilities.log(callbacks.size.toString())
-        callbacks.forEach { it.onTrimStarted() }
         val count = configModel.getSplitCount()
         val format = if (configModel.format == VideoFormat.MP3) {
             " -q:a 0 -map a "
@@ -57,6 +55,7 @@ class VideoTrimManager(private val context: Context) {
         }
 
         for (i in 0 until count) {
+            callbacks.forEach { it.onTrimStarted(i + 1, count) }
             val start = (configModel.startTime.toSeconds() + (i * configModel.splitTime))
 
             val splitTime = if ((configModel.endTime.toSeconds() - start) < configModel.splitTime) {

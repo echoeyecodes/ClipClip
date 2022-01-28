@@ -116,6 +116,10 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             val duration = viewModel.getTimeDifference()
             val progress = String.format("%.2f", ((it.time / duration.toFloat()) * 100))
             runOnUiThread {
+                progressDialogFragment.setProgressTitle(
+                    viewModel.trimProgress.first,
+                    viewModel.trimProgress.second
+                )
                 progressDialogFragment.setProgressText(progress)
             }
         }
@@ -267,8 +271,9 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         }
     }
 
-    override fun onTrimStarted() {
+    override fun onTrimStarted(index: Int, total: Int) {
         runOnUiThread {
+            viewModel.trimProgress = Pair(index, total)
             if (!supportFragmentManager.isDestroyed) {
                 AndroidUtilities.showFragment(supportFragmentManager, progressDialogFragment)
             }

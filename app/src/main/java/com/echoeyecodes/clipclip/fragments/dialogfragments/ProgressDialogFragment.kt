@@ -10,6 +10,7 @@ import com.echoeyecodes.clipclip.R
 
 class ProgressDialogFragment : BaseDialogFragment() {
 
+    private lateinit var progressTitleTextView: TextView
     private lateinit var progressTextView: TextView
 
     companion object {
@@ -42,6 +43,7 @@ class ProgressDialogFragment : BaseDialogFragment() {
     ): View {
         val view = inflater.inflate(R.layout.fragment_progress_dialog, container, false)
         progressTextView = view.findViewById(R.id.progress_description)
+        progressTitleTextView = view.findViewById(R.id.progress_title)
         return view
     }
 
@@ -49,6 +51,13 @@ class ProgressDialogFragment : BaseDialogFragment() {
     fun setProgressText(value: String) {
         if (isVisible) {
             progressTextView.text = "Current Progress: $value%"
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    fun setProgressTitle(index: Int, total:Int) {
+        if (isVisible) {
+            progressTitleTextView.text = "Trimming Video ($index of $total)"
         }
     }
 }
