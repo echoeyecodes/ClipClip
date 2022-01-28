@@ -66,6 +66,10 @@ class VideoActivityViewModel(private val duration: Long, application: Applicatio
         return timestampDifferenceLiveData
     }
 
+    fun getTimeDifference(): Long {
+        return endTime - startTime
+    }
+
     fun getEndTime(): Long {
         return endTime
     }

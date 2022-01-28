@@ -12,7 +12,9 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
     private var startX = 0f
     private var endX = 0f
     private var selectionPaint = Paint().apply {
-        color = Color.argb(70, 0, 255, 255)
+        style = Paint.Style.STROKE
+        strokeWidth = 2.5f
+        color = Color.rgb(255, 255, 255)
     }
     val thumbWidth = 30.convertToDp()
     private var selectionRectF = RectF()
@@ -40,19 +42,19 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
     fun setXCoordinates(startX: Float, endX: Float) {
         this.startX = startX
         this.endX = endX
-        selectionRectF = RectF(startX, 0f, endX + thumbWidth, bottom.toFloat())
+        selectionRectF = RectF(startX, 0f, endX + thumbWidth, height.toFloat())
         invalidate()
     }
 
     private fun setStartX(startX: Float) {
         this.startX = startX
-        selectionRectF = RectF(startX, 0f, endX + thumbWidth, bottom.toFloat())
+        selectionRectF = RectF(startX, 0f, endX + thumbWidth, height.toFloat())
         invalidate()
     }
 
     private fun setEndX(endX: Float) {
         this.endX = endX
-        selectionRectF = RectF(startX, 0f, endX + thumbWidth, bottom.toFloat())
+        selectionRectF = RectF(startX, 0f, endX + thumbWidth, height.toFloat())
         invalidate()
     }
 

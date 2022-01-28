@@ -1,18 +1,24 @@
 package com.echoeyecodes.clipclip.activities
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.echoeyecodes.clipclip.callbacks.VideoConfigurationCallback
+import com.echoeyecodes.clipclip.callbacks.VideoTrimCallback
 import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionCallback
 import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionGravity
 import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionView
 import com.echoeyecodes.clipclip.databinding.ActivityVideoSelectionBinding
+import com.echoeyecodes.clipclip.fragments.dialogfragments.ProgressDialogFragment
 import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoConfigurationDialogFragment
 import com.echoeyecodes.clipclip.models.VideoConfigModel
+import com.echoeyecodes.clipclip.services.VideoTrimService
+import com.echoeyecodes.clipclip.trimmer.VideoTrimManager
 import com.echoeyecodes.clipclip.utils.ActivityUtil
 import com.echoeyecodes.clipclip.utils.AndroidUtilities
 import com.echoeyecodes.clipclip.utils.VideoFormat
@@ -27,7 +33,8 @@ import com.google.android.exoplayer2.util.Util
 import com.google.android.material.button.MaterialButton
 
 class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listener,
-    VideoConfigurationCallback {
+    VideoConfigurationCallback, VideoTrimCallback {
+    private lateinit var videoTrimManager: VideoTrimManager
     private val binding by lazy { ActivityVideoSelectionBinding.inflate(layoutInflater) }
     private lateinit var textView: TextView
     private lateinit var timestamp: TextView
@@ -37,6 +44,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     private var player: ExoPlayer? = null
     private lateinit var playerView: PlayerView
     private lateinit var viewModel: VideoActivityViewModel
+    private lateinit var progressDialogFragment: ProgressDialogFragment
     private lateinit var videoConfigurationDialogFragment: VideoConfigurationDialogFragment
     private val handler by lazy { Handler(mainLooper) }
 
@@ -65,6 +73,12 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
                 ?: VideoConfigurationDialogFragment.newInstance().apply {
                     this.videoConfigurationCallback = this@VideoActivity
                 }
+        progressDialogFragment =
+            (supportFragmentManager.findFragmentByTag(ProgressDialogFragment.TAG) as ProgressDialogFragment?)
+                ?: ProgressDialogFragment.newInstance()
+
+        videoTrimManager = VideoTrimManager.getInstance(this)
+        videoTrimManager.addTrimCallback(this)
 
         videoSelectionView = binding.videoSelection.apply {
             selectionCallback = this@VideoActivity
@@ -92,6 +106,18 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         videoSelectionView.updateMarkerPosition(positions.first, positions.second)
 
         doneBtn.setOnClickListener { showConfigurationDialog() }
+
+        initFFMPEGListener()
+    }
+
+    private fun initFFMPEGListener() {
+        FFmpegKitConfig.enableStatisticsCallback {
+            val duration = viewModel.getTimeDifference()
+            val progress = String.format("%.2f", ((it.time / duration.toFloat()) * 100))
+            runOnUiThread {
+                progressDialogFragment.setProgressText(progress)
+            }
+        }
     }
 
     private fun showConfigurationDialog() {
@@ -221,17 +247,33 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
 
     override fun onFinish(splitTime: Int, quality: VideoQuality, format: VideoFormat) {
         val uri = intent.getStringExtra("uri")!!
-
-        ActivityUtil.startVideoSplitActivity(
-            this,
-            uri,
-            VideoConfigModel(
-                viewModel.getStartTime(),
-                viewModel.getEndTime(),
-                splitTime,
-                format,
-                quality
-            )
+        val configModel = VideoConfigModel(
+            viewModel.getStartTime(),
+            viewModel.getEndTime(),
+            splitTime,
+            format,
+            quality
         )
+        AndroidUtilities.dismissFragment(videoConfigurationDialogFragment)
+        Intent(this, VideoTrimService::class.java).apply {
+            putExtra("videoConfig", configModel)
+            putExtra("videoUri", uri)
+        }.also {
+            startService(it)
+        }
+    }
+
+    override fun onTrimStarted() {
+        runOnUiThread {
+            if (!supportFragmentManager.isDestroyed) {
+                AndroidUtilities.showFragment(supportFragmentManager, progressDialogFragment)
+            }
+        }
+    }
+
+    override fun onTrimEnded() {
+        runOnUiThread {
+            AndroidUtilities.dismissFragment(progressDialogFragment)
+        }
     }
 }

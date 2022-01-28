@@ -1,7 +1,10 @@
 package com.echoeyecodes.clipclip.customviews.videoselectionview
 
 import android.content.Context
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.RelativeLayout
@@ -13,9 +16,20 @@ class VideoSelectionMarkerView(context: Context, attr: AttributeSet) :
     var startX = 0f
     var gravity = VideoSelectionGravity.LEFT
     var selectionMarkerCallback: VideoSelectionMarkerCallback? = null
+    private var paint = Paint().apply {
+        color = Color.rgb(255, 255, 255)
+    }
+    private var path = Path()
 
-    init {
-        setBackgroundColor(Color.WHITE)
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        path.reset()
+        path.moveTo(0f, 0f)
+        path.lineTo(width.toFloat(), 0f)
+        path.lineTo(width.toFloat(), height.toFloat())
+        path.lineTo(0f, height.toFloat())
+
+        canvas.drawPath(path, paint)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {

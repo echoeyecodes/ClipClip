@@ -25,7 +25,7 @@ class VideoConfigurationDialogFragment : BaseDialogFragment(), SeekBar.OnSeekBar
     private lateinit var chipGroup: ChipGroup
     private lateinit var seekbar: SeekBar
     private val viewModel by lazy { ViewModelProvider(this)[VideoConfigurationViewModel::class.java] }
-    private val binding by lazy { FragmentVideoConfigurationBinding.inflate(layoutInflater) }
+    private lateinit var binding: FragmentVideoConfigurationBinding
     private lateinit var doneBtn: MaterialButton
     var videoConfigurationCallback: VideoConfigurationCallback? = null
 
@@ -56,7 +56,9 @@ class VideoConfigurationDialogFragment : BaseDialogFragment(), SeekBar.OnSeekBar
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return binding.root
+        val view = inflater.inflate(R.layout.fragment_video_configuration, container, false)
+        binding = FragmentVideoConfigurationBinding.bind(view)
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
