@@ -2,6 +2,7 @@ package com.echoeyecodes.clipclip.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.widget.TextView
@@ -255,11 +256,14 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             quality
         )
         AndroidUtilities.dismissFragment(videoConfigurationDialogFragment)
-        Intent(this, VideoTrimService::class.java).apply {
+        val serviceIntent = Intent(this, VideoTrimService::class.java).apply {
             putExtra("videoConfig", configModel)
             putExtra("videoUri", uri)
-        }.also {
-            startService(it)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent)
+        } else {
+            startService(serviceIntent)
         }
     }
 
