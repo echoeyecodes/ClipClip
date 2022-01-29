@@ -1,5 +1,13 @@
 package com.echoeyecodes.clipclip.utils
 
+import android.content.res.Resources
+
+
+fun getScreenSize():Pair<Int, Int>{
+    return Pair(Resources.getSystem().displayMetrics.widthPixels, Resources.getSystem().displayMetrics.heightPixels)
+}
+
+
 enum class VideoQuality(name: String) {
     LOW("low"),
     MEDIUM("medium"),

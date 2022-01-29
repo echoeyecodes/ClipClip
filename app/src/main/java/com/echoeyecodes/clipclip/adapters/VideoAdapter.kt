@@ -11,14 +11,19 @@ import com.echoeyecodes.clipclip.callbacks.VideoAdapterCallback
 import com.echoeyecodes.clipclip.databinding.LayoutVideoItemBinding
 import com.echoeyecodes.clipclip.models.VideoModel
 import com.echoeyecodes.clipclip.utils.VideoModelItemCallback
+import com.echoeyecodes.clipclip.utils.convertToDp
+import com.echoeyecodes.clipclip.utils.getScreenSize
 
 class VideoAdapter(private val callback: VideoAdapterCallback) :
     ListAdapter<VideoModel, VideoAdapter.VideoAdapterViewHolder>(VideoModelItemCallback()) {
 
+    private val size = (getScreenSize().first/2) - 6.convertToDp()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoAdapterViewHolder {
-        val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.layout_video_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.layout_video_item, parent, false)
+        val height = (size + (size * 0.1)).toInt()
+        view.layoutParams.width = size
+        view.layoutParams.height = height
         return VideoAdapterViewHolder(view)
     }
 
@@ -31,7 +36,7 @@ class VideoAdapter(private val callback: VideoAdapterCallback) :
         private val imageView = layoutBinding.image
 
         fun bind(model: VideoModel) {
-            Glide.with(view).load(model.getVideoUri()).into(imageView)
+            Glide.with(view).load(model.getVideoUri()).sizeMultiplier(0.5f).override(size).into(imageView)
             view.setOnClickListener { callback.onVideoSelected(model) }
         }
     }
