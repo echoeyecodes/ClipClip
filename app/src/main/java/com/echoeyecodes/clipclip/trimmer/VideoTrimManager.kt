@@ -150,7 +150,7 @@ class VideoTrimManager(private val context: Context) {
         splitTime: String
     ) {
         val iUri = FFmpegKitConfig.getSafParameterForRead(context, videoUri)
-        val oUri = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+        val oUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             FFmpegKitConfig.getSafParameterForWrite(context, path)
         } else {
             path.toString()
