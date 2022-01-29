@@ -54,7 +54,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     private val playerRunnable = object : Runnable {
         override fun run() {
             checkPlayerProgress()
-            handler.postDelayed(this, 300)
+            handler.postDelayed(this, 10)
         }
     }
 
@@ -249,11 +249,16 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     private fun checkPlayerProgress() {
         player?.let {
             val position = it.currentPosition
+            updateVideoProgressMarker(position)
             if (position >= viewModel.getEndTime()) {
                 viewModel.currentPosition = viewModel.getStartTime()
                 it.pause()
             }
         }
+    }
+
+    private fun updateVideoProgressMarker(value: Long) {
+        videoSelectionView.updateProgressMarkerPosition(viewModel.getProgressMarkerPosition(value))
     }
 
     override fun onFinish(splitTime: Int, quality: VideoQuality, format: VideoFormat) {

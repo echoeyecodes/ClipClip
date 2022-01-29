@@ -39,6 +39,10 @@ class VideoActivityViewModel(private val duration: Long, application: Applicatio
         return Pair(start, end)
     }
 
+    fun getProgressMarkerPosition(value: Long): Float {
+        return value.toFloat() / duration.toFloat()
+    }
+
     /*
         Get the total duration for the current video trim cut
      */

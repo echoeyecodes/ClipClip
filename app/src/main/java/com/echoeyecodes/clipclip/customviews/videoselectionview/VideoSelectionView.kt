@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewGroup
 import com.echoeyecodes.clipclip.utils.convertToDp
+import kotlin.math.abs
 
 class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
     ViewGroup(context, attributeSet), VideoSelectionMarkerCallback {
@@ -31,9 +32,11 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
             gravity = VideoSelectionGravity.RIGHT
             selectionMarkerCallback = this@VideoSelectionView
         }
+        val progressMarker = VideoProgressMarkerView(context, attributeSet)
 
         addView(thumbOne)
         addView(thumbTwo)
+        addView(progressMarker)
         post {
             setXCoordinates(0f, (width - thumbWidth).toFloat())
         }
@@ -102,9 +105,11 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         val firstThumb = getChildAt(0) as VideoSelectionMarkerView
         val secondThumb = getChildAt(1) as VideoSelectionMarkerView
+        val progressMarker = getChildAt(2) as VideoProgressMarkerView
 
         firstThumb.layout(startX.toInt(), 0, (startX + thumbWidth).toInt(), height)
         secondThumb.layout(endX.toInt(), 0, (endX + thumbWidth).toInt(), height)
+        progressMarker.layout(thumbWidth, 0, thumbWidth + 2, height)
     }
 
     fun getBound(gravity: VideoSelectionGravity): Float {
@@ -144,17 +149,6 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
         return Pair(_x1, _x2)
     }
 
-    fun updateMarkerPosition(gravity: VideoSelectionGravity, percentageValue: Float) {
-        val child = if (gravity == VideoSelectionGravity.LEFT) {
-            getChildAt(0) as VideoSelectionMarkerView
-        } else {
-            getChildAt(1) as VideoSelectionMarkerView
-        }
-        val value = percentageValue * (width - thumbWidth)
-        child.selectMarkerPosition(value)
-    }
-
-
     /**
      * Positions markers in specific positions via percentage values
      * ranges from 0.0 - 1.0
@@ -174,6 +168,17 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
 
             thumb1.selectMarkerPosition(value1)
             thumb2.selectMarkerPosition(value2)
+        }
+    }
+
+    fun updateProgressMarkerPosition(value: Float) {
+        post {
+            val progressMarkerView = getChildAt(2) as VideoProgressMarkerView
+
+            val offset = thumbWidth
+            val selectionWidth = width - (2 * offset)
+            val position = offset + (value * selectionWidth)
+            progressMarkerView.selectMarkerPosition(position)
         }
     }
 }
