@@ -54,7 +54,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     private val playerRunnable = object : Runnable {
         override fun run() {
             checkPlayerProgress()
-            handler.postDelayed(this, 10)
+            handler.postDelayed(this, 30)
         }
     }
 
