@@ -36,6 +36,7 @@
                 android:id="@+id/progress_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                style="@style/Regular"
                 android:text="Current Progress: 0.0%" />
 
             <com.google.android.material.button.MaterialButton

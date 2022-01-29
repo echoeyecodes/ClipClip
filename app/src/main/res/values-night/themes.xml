@@ -236,4 +236,8 @@
         <item name="cardBackgroundColor">@color/shot_overlay</item>
     </style>
 
+    <style name="CustomRadioButtonStyle" parent="">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
 </resources>

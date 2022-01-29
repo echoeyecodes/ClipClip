@@ -65,6 +65,7 @@
                     android:id="@+id/low"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    style="@style/CustomRadioButtonStyle"
                     android:text="Low" />
 
                 <RadioButton
@@ -72,6 +73,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
+                    style="@style/CustomRadioButtonStyle"
                     android:text="Medium" />
 
                 <RadioButton
@@ -80,6 +82,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="5dp"
                     android:checked="true"
+                    style="@style/CustomRadioButtonStyle"
                     android:text="High" />
 
             </RadioGroup>
