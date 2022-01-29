@@ -230,6 +230,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         bufferProgressContainer.isVisible = playbackState == ExoPlayer.STATE_BUFFERING
         when (playbackState) {
             ExoPlayer.STATE_READY -> {
+                updateVideoProgressMarker(player?.currentPosition ?: 0)
 //                val duration = player?.duration ?: 0
 //                viewModel.duration = duration
             }
