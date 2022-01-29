@@ -12,8 +12,8 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.echoeyecodes.booktweet"
-        minSdk 24
+        applicationId "com.echoeyecodes.clipclip"
+        minSdk 21
         targetSdk 31
         versionCode 1
         versionName "1.0"
@@ -84,7 +84,7 @@ dependencies {
     kapt "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
     implementation "androidx.fragment:fragment-ktx:1.4.0"
 
-    implementation 'com.arthenica:ffmpeg-kit-full-gpl:4.5.1'
+    implementation 'com.arthenica:ffmpeg-kit-min-gpl:4.5.1.LTS'
 
     implementation "com.google.android.exoplayer:exoplayer-core:$exo_version"
     implementation "com.google.android.exoplayer:exoplayer-dash:$exo_version"
