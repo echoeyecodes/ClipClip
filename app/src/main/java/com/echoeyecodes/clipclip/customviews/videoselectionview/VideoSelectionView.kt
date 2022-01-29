@@ -17,7 +17,7 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
         strokeWidth = 2.5f
         color = Color.rgb(255, 255, 255)
     }
-    val thumbWidth = 30.convertToDp()
+    val thumbWidth = 20.convertToDp()
     private var selectionRectF = RectF()
     var selectionCallback: VideoSelectionCallback? = null
 
