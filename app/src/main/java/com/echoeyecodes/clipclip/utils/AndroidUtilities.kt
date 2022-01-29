@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -13,6 +14,7 @@ import androidx.fragment.app.FragmentManager
 import com.echoeyecodes.clipclip.fragments.dialogfragments.BaseDialogFragment
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
 
 class AndroidUtilities {
@@ -57,11 +59,11 @@ class AndroidUtilities {
         fun log(message: String) = Log.d("CARRR", message)
         fun runOnTimeout(time: Long, doWork: () -> Unit) = Timer().schedule(time) { doWork() }
 
-        fun openShareIntent(link: String, activity: Activity) {
+        fun openShareIntent(uris: ArrayList<Uri>, activity: Activity) {
             val intent = Intent().apply {
-                action = Intent.ACTION_SEND
-                putExtra(Intent.EXTRA_TEXT, link)
-                type = "text/plain"
+                action = Intent.ACTION_SEND_MULTIPLE
+                type = "video/mp4"
+                putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
             }
             activity.startActivity(Intent.createChooser(intent, "Share Post"))
         }

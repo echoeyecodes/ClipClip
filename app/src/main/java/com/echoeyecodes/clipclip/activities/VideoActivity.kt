@@ -2,6 +2,7 @@ package com.echoeyecodes.clipclip.activities
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -298,9 +299,10 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         }
     }
 
-    override fun onTrimEnded() {
+    override fun onTrimEnded(uris: List<Uri>) {
         lifecycleScope.launchWhenResumed {
             AndroidUtilities.dismissFragment(progressDialogFragment)
+            AndroidUtilities.openShareIntent(ArrayList(uris), this@VideoActivity)
         }
     }
 }

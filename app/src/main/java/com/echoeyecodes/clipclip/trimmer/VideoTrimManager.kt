@@ -59,7 +59,7 @@ class VideoTrimManager(private val context: Context) {
             }
             "-vcodec libx264 -crf $sizeValue"
         }
-
+        val uris = ArrayList<Uri>()
         for (i in 0 until count) {
             if (shouldTerminate) {
                 break
@@ -82,6 +82,7 @@ class VideoTrimManager(private val context: Context) {
                     context.getString(R.string.app_name).plus(i),
                     configModel.format.extension
                 )?.let {
+                    uris.add(it)
                     executeVideoEdit(
                         videoUri.toUri(),
                         it,
@@ -92,7 +93,7 @@ class VideoTrimManager(private val context: Context) {
                 }
             }
         }
-        callbacks.forEach { it.onTrimEnded() }
+        callbacks.forEach { it.onTrimEnded(uris) }
     }
 
     private fun createFile(filename: String, extension: String): Uri? {
