@@ -6,10 +6,10 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.echoeyecodes.clipclip.databinding.ActivityWelcomeBinding
 import com.echoeyecodes.clipclip.utils.AndroidUtilities
 import android.content.pm.PackageManager
 import android.os.Build
+import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -18,20 +18,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.echoeyecodes.clipclip.R
 import com.echoeyecodes.clipclip.adapters.VideoAdapter
 import com.echoeyecodes.clipclip.callbacks.VideoAdapterCallback
+import com.echoeyecodes.clipclip.databinding.ActivitySelectVideoBinding
 import com.echoeyecodes.clipclip.models.VideoModel
 import com.echoeyecodes.clipclip.utils.ActivityUtil
 import com.echoeyecodes.clipclip.utils.CustomItemDecoration
-import com.echoeyecodes.clipclip.viewmodels.VideoSelectionActivityViewModel
+import com.echoeyecodes.clipclip.viewmodels.SelectionVideoActivityViewModel
 
 
-class WelcomeActivity : AppCompatActivity(), VideoAdapterCallback {
-    private val binding by lazy { ActivityWelcomeBinding.inflate(layoutInflater) }
+class SelectVideoActivity : AppCompatActivity(), VideoAdapterCallback {
+    private val binding by lazy { ActivitySelectVideoBinding.inflate(layoutInflater) }
     private lateinit var recyclerView: RecyclerView
+    private lateinit var closeBtn:View
     private val requiredPermissions = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
-    private val viewModel by lazy { ViewModelProvider(this)[VideoSelectionActivityViewModel::class.java] }
+    private val viewModel by lazy { ViewModelProvider(this)[SelectionVideoActivityViewModel::class.java] }
 
     companion object {
         const val PERMISSIONS_REQUEST_CODE = 3
@@ -43,6 +45,7 @@ class WelcomeActivity : AppCompatActivity(), VideoAdapterCallback {
 
         createNotificationChannel()
         recyclerView = binding.recyclerView
+        closeBtn = binding.toolbar.closeBtn
 
         val adapter = VideoAdapter(this)
         val layoutManager = GridLayoutManager(this, 2)
@@ -55,6 +58,7 @@ class WelcomeActivity : AppCompatActivity(), VideoAdapterCallback {
         viewModel.getVideosLiveData().observe(this, {
             adapter.submitList(it)
         })
+        closeBtn.setOnClickListener { finish() }
         checkDataAccessPermissions()
     }
 

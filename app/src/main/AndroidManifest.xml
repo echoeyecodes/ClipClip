@@ -19,7 +19,7 @@
         <receiver android:name=".receivers.VideoTrimBroadcastReceiver" android:exported="true" />
         <service android:name=".services.VideoTrimService" />
         <activity
-            android:name="com.echoeyecodes.clipclip.activities.WelcomeActivity"
+            android:name="com.echoeyecodes.clipclip.activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,6 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.SelectVideoActivity" />
         <activity android:name="com.echoeyecodes.clipclip.activities.VideoActivity" />
 
     </application>
