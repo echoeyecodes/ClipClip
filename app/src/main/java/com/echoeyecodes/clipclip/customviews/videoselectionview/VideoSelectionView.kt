@@ -165,8 +165,12 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
         post {
             val thumb1 = getChildAt(0) as VideoSelectionMarkerView
             val thumb2 = getChildAt(1) as VideoSelectionMarkerView
-            val value1 = startX * (width - thumbWidth)
-            val value2 = endX * (width - thumbWidth)
+
+            val offset = thumbWidth
+            val selectionWidth = width - (2 * offset)
+
+            val value1 = startX * selectionWidth
+            val value2 = ((endX) * (selectionWidth)) + offset
 
             thumb1.selectMarkerPosition(value1)
             thumb2.selectMarkerPosition(value2)
