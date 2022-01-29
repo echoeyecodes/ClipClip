@@ -299,6 +299,14 @@ fun Int.formatTimeToDigits(): String {
     return "${hours.withPrefix()}:${minutes.withPrefix()}:${seconds.withPrefix()}"
 }
 
+fun Long.formatTimeToDigits(): String {
+    val totalSeconds = this/1000
+    val hours = "0".plus(totalSeconds / 60 / 60)
+    val minutes = "0".plus((totalSeconds / 60 % 60))
+    val seconds = "0".plus((totalSeconds % 60 % 60) % 60)
+    return "${hours.withPrefix()}:${minutes.withPrefix()}:${seconds.withPrefix()}"
+}
+
 fun Long.toSeconds(): Int {
     return (this.toFloat() / 1000).toInt()
 }
