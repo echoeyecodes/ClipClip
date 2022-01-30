@@ -50,12 +50,14 @@ class VideoTrimService : Service() {
     }
 
     private fun showNotification(intent: PendingIntent): Notification {
-        val broadcastPendingIntent = Intent(applicationContext, VideoTrimBroadcastReceiver::class.java).apply {
-            action = VideoTrimBroadcastReceiver.TERMINATE_TRIM_REQUEST_CODE
-        }
-        val broadcastIntent = PendingIntent.getBroadcast(applicationContext, 0, broadcastPendingIntent, 0)
+        val broadcastPendingIntent =
+            Intent(applicationContext, VideoTrimBroadcastReceiver::class.java).apply {
+                action = VideoTrimBroadcastReceiver.TERMINATE_TRIM_REQUEST_CODE
+            }
+        val broadcastIntent =
+            PendingIntent.getBroadcast(applicationContext, 0, broadcastPendingIntent, 0)
         val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.ic_notification_icon)
             .setContentTitle("Trimming Started")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(intent)
