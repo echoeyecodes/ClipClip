@@ -1,24 +1,30 @@
 package com.echoeyecodes.clipclip.viewmodels
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import android.net.Uri
+import android.provider.MediaStore
+import android.provider.OpenableColumns
 import androidx.lifecycle.*
+import com.echoeyecodes.clipclip.utils.AndroidUtilities
 import com.echoeyecodes.clipclip.utils.toSeconds
 import com.echoeyecodes.clipclip.utils.withPrefix
 import kotlin.math.max
 
-class VideoActivityViewModelFactory(private val duration: Long, private val context: Context) :
+class VideoActivityViewModelFactory(private val uri: String, private val context: Context) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(VideoActivityViewModel::class.java)) {
-            return VideoActivityViewModel(duration, context.applicationContext as Application) as T
+            return VideoActivityViewModel(uri, context.applicationContext as Application) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
 
-class VideoActivityViewModel(private val duration: Long, application: Application) :
+class VideoActivityViewModel(val uri: String, application: Application) :
     AndroidViewModel(application) {
+    private val duration: Long
     var isPlaying = true
     private var startTime: Long = 0L
     private var endTime: Long = 100L
@@ -29,7 +35,41 @@ class VideoActivityViewModel(private val duration: Long, application: Applicatio
     var splitTime = 1
 
     init {
+        duration = getVideoDuration(Uri.parse(uri))
         setVideoTimestamps(0f, 100f)
+    }
+
+    /*
+    Could have used a single content resolver query to retrieve video duration, but
+    I can't seem to get the duration column if the video file is sent via a share
+    intent due to FileProvider's internal mechanism. Since File Provider provides access to
+    the display name of the file, the initial content resolver query retrieves the name, and
+    passes it to the second content resolver query to query all video files and return the
+    single file that matches the selection filter query based on the display name
+     */
+    @SuppressLint("Range", "Recycle")
+    private fun getVideoDuration(uri: Uri): Long {
+        val contentResolver = getApplication<Application>().contentResolver
+        val cursor = contentResolver.query(uri, null, null, null, null)
+        return if (cursor != null && cursor.moveToNext()) {
+            val displayName = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+
+            val projections = arrayOf(MediaStore.Video.Media.DURATION)
+            val innerCursor = contentResolver.query(
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projections,
+                MediaStore.Video.Media.DISPLAY_NAME.plus(" LIKE ? "),
+                arrayOf(displayName),
+                null
+            )
+            if (innerCursor != null && innerCursor.moveToNext()) {
+                innerCursor.getLong(innerCursor.getColumnIndex(projections[0]))
+            } else {
+                0
+            }
+        } else {
+            0
+        }
     }
 
     fun getMarkerPositions(): Pair<Float, Float> {

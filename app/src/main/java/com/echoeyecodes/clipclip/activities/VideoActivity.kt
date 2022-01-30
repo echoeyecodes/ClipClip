@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Parcelable
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -69,10 +70,10 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         bufferProgressContainer = binding.bufferProgressContainer
         durationTextView = binding.totalDuration
 
-        val duration = intent.getLongExtra("duration", 0L)
-
-        val viewModelFactory = VideoActivityViewModelFactory(duration, this)
+        val videoUri = getVideoUri() ?: return finish()
+        val viewModelFactory = VideoActivityViewModelFactory(videoUri, this)
         viewModel = ViewModelProvider(this, viewModelFactory)[VideoActivityViewModel::class.java]
+
         videoConfigurationDialogFragment =
             (supportFragmentManager.findFragmentByTag(VideoConfigurationDialogFragment.TAG) as VideoConfigurationDialogFragment?)
                 ?: VideoConfigurationDialogFragment.newInstance().apply {
@@ -148,12 +149,15 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         }
     }
 
-    private fun initPlayer() {
-        val uri = intent.getStringExtra("uri") ?: return finish()
+    private fun getVideoUri(): String? {
+        val externalUri = intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as Uri?
+        return externalUri?.toString() ?: intent.getStringExtra("uri")
+    }
 
+    private fun initPlayer() {
         player = ExoPlayer.Builder(this).build().also {
             playerView.player = it
-            val mediaItem = MediaItem.fromUri(uri)
+            val mediaItem = MediaItem.fromUri(viewModel.uri)
             it.setMediaItem(mediaItem)
             it.seekTo(viewModel.currentPosition)
             it.playWhenReady = viewModel.isPlaying
@@ -264,7 +268,6 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     }
 
     override fun onFinish(splitTime: Int, quality: VideoQuality, format: VideoFormat) {
-        val uri = intent.getStringExtra("uri")!!
         val configModel = VideoConfigModel(
             viewModel.getStartTime(),
             viewModel.getEndTime(),
@@ -276,7 +279,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         AndroidUtilities.dismissFragment(videoConfigurationDialogFragment)
         val serviceIntent = Intent(this, VideoTrimService::class.java).apply {
             putExtra("videoConfig", configModel)
-            putExtra("videoUri", uri)
+            putExtra("videoUri", viewModel.uri)
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(serviceIntent)
