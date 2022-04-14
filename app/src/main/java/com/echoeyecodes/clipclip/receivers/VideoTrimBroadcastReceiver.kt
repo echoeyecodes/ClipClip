@@ -3,7 +3,7 @@ package com.echoeyecodes.clipclip.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.echoeyecodes.clipclip.services.VideoTrimService
+import com.arthenica.ffmpegkit.FFmpegKit
 
 class VideoTrimBroadcastReceiver : BroadcastReceiver() {
 
@@ -14,7 +14,7 @@ class VideoTrimBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val action = intent.action
         if (action == TERMINATE_TRIM_REQUEST_CODE) {
-            context.stopService(Intent(context, VideoTrimService::class.java))
+            FFmpegKit.cancel()
         }
     }
 }

@@ -7,8 +7,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.work.WorkManager
+import com.arthenica.ffmpegkit.FFmpegKit
 import com.echoeyecodes.clipclip.R
-import com.echoeyecodes.clipclip.services.VideoTrimService
+import com.echoeyecodes.clipclip.workmanager.VideoTrimWorkManager
 
 class ProgressDialogFragment : BaseDialogFragment() {
 
@@ -54,7 +56,8 @@ class ProgressDialogFragment : BaseDialogFragment() {
     }
 
     private fun terminateService() {
-        requireContext().stopService(Intent(context, VideoTrimService::class.java))
+        FFmpegKit.cancel()
+        WorkManager.getInstance(requireContext()).cancelAllWorkByTag(VideoTrimWorkManager.TAG)
     }
 
     @SuppressLint("SetTextI18n")

@@ -10,8 +10,10 @@ import android.provider.OpenableColumns
 import android.util.TypedValue
 import androidx.core.view.doOnLayout
 import androidx.recyclerview.widget.RecyclerView
+import com.echoeyecodes.clipclip.models.VideoConfigModel
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -71,7 +73,7 @@ fun Int.formatTimeToDigits(): String {
 }
 
 fun Long.formatTimeToDigits(): String {
-    val totalSeconds = this/1000
+    val totalSeconds = this / 1000
     val hours = "0".plus(totalSeconds / 60 / 60)
     val minutes = "0".plus((totalSeconds / 60 % 60))
     val seconds = "0".plus((totalSeconds % 60 % 60) % 60)
@@ -90,4 +92,14 @@ fun String.formatDigitsToLong(): Long {
 
 fun Long.toSeconds(): Int {
     return (this.toFloat() / 1000).toInt()
+}
+
+fun String.toVideoConfigModel(): VideoConfigModel {
+    val gson = Gson()
+    return gson.fromJson(this, VideoConfigModel::class.java)
+}
+
+fun VideoConfigModel.serialize(): String {
+    val gson = Gson()
+    return gson.toJson(this)
 }

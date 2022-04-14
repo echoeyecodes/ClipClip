@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.work.*
 import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.echoeyecodes.clipclip.callbacks.VideoConfigurationCallback
 import com.echoeyecodes.clipclip.callbacks.VideoTimestampCallback
@@ -23,11 +24,11 @@ import com.echoeyecodes.clipclip.fragments.dialogfragments.ProgressDialogFragmen
 import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoConfigurationDialogFragment
 import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoTimestampDialogFragment
 import com.echoeyecodes.clipclip.models.VideoConfigModel
-import com.echoeyecodes.clipclip.services.VideoTrimService
 import com.echoeyecodes.clipclip.trimmer.VideoTrimManager
 import com.echoeyecodes.clipclip.utils.*
 import com.echoeyecodes.clipclip.viewmodels.VideoActivityViewModel
 import com.echoeyecodes.clipclip.viewmodels.VideoActivityViewModelFactory
+import com.echoeyecodes.clipclip.workmanager.VideoTrimWorkManager
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
@@ -289,15 +290,13 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         )
         viewModel.splitTime = splitTime
         AndroidUtilities.dismissFragment(videoConfigurationDialogFragment)
-        val serviceIntent = Intent(this, VideoTrimService::class.java).apply {
-            putExtra("videoConfig", configModel)
-            putExtra("videoUri", viewModel.uri)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent)
-        } else {
-            startService(serviceIntent)
-        }
+        val workData = Data.Builder().apply {
+            putString("videoConfig", configModel.serialize())
+            putString("videoUri", viewModel.uri)
+        }.build()
+        val workRequest = OneTimeWorkRequestBuilder<VideoTrimWorkManager>()
+            .addTag(VideoTrimWorkManager.TAG).setInputData(workData).setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST).build()
+        WorkManager.getInstance(this).enqueueUniqueWork(VideoTrimWorkManager.TAG, ExistingWorkPolicy.KEEP, workRequest)
     }
 
     override fun onPlayerError(error: PlaybackException) {

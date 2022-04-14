@@ -19,7 +19,6 @@
         <receiver
             android:name=".receivers.VideoTrimBroadcastReceiver"
             android:exported="true" />
-        <service android:name=".services.VideoTrimService" />
 
         <activity
             android:name="com.echoeyecodes.clipclip.activities.MainActivity"
