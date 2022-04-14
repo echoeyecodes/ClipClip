@@ -1,9 +1,9 @@
 package com.echoeyecodes.clipclip.activities
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import com.echoeyecodes.clipclip.R
 import com.echoeyecodes.clipclip.databinding.ActivityMainBinding
 import com.echoeyecodes.clipclip.utils.ActivityUtil
@@ -26,9 +26,9 @@ class MainActivity : AppCompatActivity() {
         updateStatusAndNavColor()
     }
 
-    @SuppressLint("ResourceAsColor")
     private fun updateStatusAndNavColor() {
-        window.statusBarColor = resources.getColor(R.color.colorPrimary, null)
-        window.navigationBarColor = resources.getColor(R.color.colorPrimary, null)
+        val color = ResourcesCompat.getColor(resources, R.color.colorPrimary, null)
+        window.statusBarColor = color
+        window.navigationBarColor = color
     }
 }
