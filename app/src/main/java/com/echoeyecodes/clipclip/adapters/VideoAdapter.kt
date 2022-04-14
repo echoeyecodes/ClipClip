@@ -18,7 +18,7 @@ import com.echoeyecodes.clipclip.utils.getScreenSize
 class VideoAdapter(private val callback: VideoAdapterCallback) :
     ListAdapter<VideoModel, VideoAdapter.VideoAdapterViewHolder>(VideoModelItemCallback()) {
 
-    private val size = (getScreenSize().first / 2) - 6.convertToDp()
+    private val size = (getScreenSize().first / 4) - 6.convertToDp()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoAdapterViewHolder {
         val view =

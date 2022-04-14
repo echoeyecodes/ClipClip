@@ -48,7 +48,7 @@ class SelectVideoActivity : AppCompatActivity(), VideoAdapterCallback {
         closeBtn = binding.toolbar.closeBtn
 
         val adapter = VideoAdapter(this)
-        val layoutManager = GridLayoutManager(this, 2)
+        val layoutManager = GridLayoutManager(this, 4)
         val itemDecoration = CustomItemDecoration(2)
 
         recyclerView.layoutManager = layoutManager
