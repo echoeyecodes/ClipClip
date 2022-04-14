@@ -56,7 +56,7 @@ class AndroidUtilities {
         fun showToastMessage(context: Context, message: String) =
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 
-        fun log(message: String) = Log.d("CARRR", message)
+        fun log(message: Any) = Log.d("CARRR", message.toString())
         fun runOnTimeout(time: Long, doWork: () -> Unit) = Timer().schedule(time) { doWork() }
 
         fun openShareIntent(uris: ArrayList<Uri>, activity: Activity) {

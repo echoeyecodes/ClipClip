@@ -1,184 +1,222 @@
 package com.echoeyecodes.clipclip.customviews.videoselectionview
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.DashPathEffect
+import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.view.ViewGroup
-import com.echoeyecodes.clipclip.utils.convertToDp
-import kotlin.math.abs
+import android.view.View
+import androidx.core.content.res.ResourcesCompat
+import com.echoeyecodes.clipclip.R
+import java.lang.Math.abs
+import kotlin.math.max
+import kotlin.math.min
+
 
 class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
-    ViewGroup(context, attributeSet), VideoSelectionMarkerCallback {
+    View(context, attributeSet) {
+
+    enum class TouchPoint {
+        LEFT,
+        RIGHT,
+        CENTER
+    }
+
     private var startX = 0f
     private var endX = 0f
-    private var selectionPaint = Paint().apply {
+    private var _width = 0
+    private var _height = 0
+
+    private var touchPoint: TouchPoint? = null
+    private val selectionPaint = Paint().apply {
+        strokeWidth = 6f
+        color = Color.WHITE
         style = Paint.Style.STROKE
-        strokeWidth = 2.5f
-        color = Color.rgb(255, 255, 255)
     }
-    val thumbWidth = 20.convertToDp()
-    private var selectionRectF = RectF()
+    private val thumbPaint = Paint().apply {
+        color = Color.WHITE
+        pathEffect = DashPathEffect(floatArrayOf(5f, 5f, 5f, 5f), 0f)
+    }
+    private val progressPaint = Paint().apply {
+        color = Color.WHITE
+    }
+    private val paint = Paint().apply {
+        color = ResourcesCompat.getColor(resources, R.color.shot_overlay, null)
+    }
+    private var thumbStart = 0f
+    private var thumbEnd = 0f
+    private var progressPosition = 0f
     var selectionCallback: VideoSelectionCallback? = null
 
-    private var thumbX = 0f
-
-    init {
-        setWillNotDraw(false)
-        val thumbOne = VideoSelectionMarkerView(context, attributeSet).apply {
-            selectionMarkerCallback = this@VideoSelectionView
-        }
-        val thumbTwo = VideoSelectionMarkerView(context, attributeSet).apply {
-            gravity = VideoSelectionGravity.RIGHT
-            selectionMarkerCallback = this@VideoSelectionView
-        }
-        val progressMarker = VideoProgressMarkerView(context, attributeSet)
-
-        addView(thumbOne)
-        addView(thumbTwo)
-        addView(progressMarker)
-        post {
-            setXCoordinates(0f, (width - thumbWidth).toFloat())
-        }
-    }
-
-    fun setXCoordinates(startX: Float, endX: Float) {
-        this.startX = startX
-        this.endX = endX
-        selectionRectF = RectF(startX, 0f, endX + thumbWidth, height.toFloat())
-        invalidate()
-    }
-
-    private fun setStartX(startX: Float) {
-        this.startX = startX
-        selectionRectF = RectF(startX, 0f, endX + thumbWidth, height.toFloat())
-        invalidate()
-    }
-
-    private fun setEndX(endX: Float) {
-        this.endX = endX
-        selectionRectF = RectF(startX, 0f, endX + thumbWidth, height.toFloat())
-        invalidate()
+    companion object {
+        const val SIZE = 80f
     }
 
     override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-        canvas.drawRect(selectionRectF, selectionPaint)
+        //start thumb
+
+        canvas.drawLine(thumbStart + SIZE, 0f, thumbStart + SIZE, height.toFloat(), thumbPaint)
+
+        //end thumb
+        canvas.drawLine((thumbEnd - SIZE), 0f, (thumbEnd - SIZE), height.toFloat(), thumbPaint)
+
+        //progress line
+        canvas.drawLine(progressPosition, 0f, progressPosition, height.toFloat(), progressPaint)
+
+        //round rect between start of thumb and end of thumb
+        canvas.drawRoundRect(
+            thumbStart, 0f, thumbEnd, bottom.toFloat() - 42,
+            16f,
+            16f,
+            selectionPaint
+        )
+
+        //view background
+        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val _x = event.rawX
 
         return when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                thumbX = startX - _x
+                startX = thumbStart + (x - event.rawX)
+                endX = (width - thumbEnd) - (x - event.rawX)
+
+                _width = width
+                _height = height
+
+                if (isLeft(event.x)) {
+                    touchPoint = TouchPoint.LEFT
+                } else if (isRight(event.x)) {
+                    touchPoint = TouchPoint.RIGHT
+                } else {
+                    touchPoint = TouchPoint.CENTER
+                }
+                selectionCallback?.onSelectionStarted(thumbStart / width, thumbEnd / width)
                 true
             }
             MotionEvent.ACTION_MOVE -> {
-                val thumb1 = getChildAt(0) as VideoSelectionMarkerView
-                val thumb2 = getChildAt(1) as VideoSelectionMarkerView
+                val positionX = (_x + startX)
+                val positionX1 = _x + (_width - abs(endX))
 
-                val newStartX = _x + thumbX
-                val newEndX = this.endX + (newStartX - this.startX)
-
-                if (newStartX >= 0 && newEndX < (width - thumbWidth).toFloat()) {
-                    onMarkerSelected(VideoSelectionGravity.LEFT)
-                    thumb1.selectMarkerPosition(newStartX)
-                    thumb2.selectMarkerPosition(newEndX)
+                when (touchPoint) {
+                    TouchPoint.LEFT -> {
+                        resizeLeft(positionX)
+                    }
+                    TouchPoint.RIGHT -> {
+                        resizeRight(positionX1)
+                    }
+                    TouchPoint.CENTER -> {
+                        moveView(positionX)
+                    }
                 }
                 true
             }
             MotionEvent.ACTION_UP -> {
-                if (isBetweenCoordinates(_x)) {
-                    onMarkerReleased(VideoSelectionGravity.LEFT)
-                }
+                touchPoint = null
+                selectionCallback?.onSelectionEnded(thumbStart / width, thumbEnd / width)
                 true
             }
             else -> false
         }
     }
 
-    private fun isBetweenCoordinates(value: Float): Boolean {
-        return value in startX..endX
+    private fun isLeft(positionX: Float): Boolean {
+        return (positionX in thumbStart..thumbStart + SIZE)
     }
 
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        val firstThumb = getChildAt(0) as VideoSelectionMarkerView
-        val secondThumb = getChildAt(1) as VideoSelectionMarkerView
-        val progressMarker = getChildAt(2) as VideoProgressMarkerView
-
-        firstThumb.layout(startX.toInt(), 0, (startX + thumbWidth).toInt(), height)
-        secondThumb.layout(endX.toInt(), 0, (endX + thumbWidth).toInt(), height)
-        progressMarker.layout(thumbWidth, 0, thumbWidth + 2, height)
+    private fun isRight(positionX: Float): Boolean {
+        return (positionX in thumbEnd - SIZE..thumbEnd)
     }
 
-    fun getBound(gravity: VideoSelectionGravity): Float {
-        return if (gravity == VideoSelectionGravity.LEFT) {
-            endX
-        } else {
-            startX
-        }
+    private fun moveView(positionX: Float) {
+        val start = getMinMaxLeft(positionX)
+        val end = getMinMaxRight(thumbEnd - (thumbStart - start))
+        thumbStart -= (thumbEnd - end)
+        thumbEnd = end
+        executeCallback()
+        invalidate()
     }
 
-    override fun onMarkerMove(gravity: VideoSelectionGravity, valueX: Float) {
-        if (gravity == VideoSelectionGravity.LEFT) {
-            setStartX(valueX)
-        } else {
-            setEndX(valueX)
-        }
-        val range = determineSelectionRange(startX, endX)
-        selectionCallback?.onSelectionMoved(range.first, range.second)
+    private fun resizeLeft(positionX: Float) {
+        thumbStart = getMinMaxLeft(positionX)
+        executeCallback()
+        invalidate()
     }
 
-    override fun onMarkerSelected(gravity: VideoSelectionGravity) {
-        val range = determineSelectionRange(startX, endX)
-        selectionCallback?.onSelectionStarted(gravity, range.first, range.second)
+    private fun resizeRight(positionX: Float) {
+        thumbEnd = getMinMaxRight(positionX)
+        executeCallback()
+        invalidate()
     }
 
-    override fun onMarkerReleased(gravity: VideoSelectionGravity) {
-        val range = determineSelectionRange(startX, endX)
-        selectionCallback?.onSelectionEnded(gravity, range.first, range.second)
+    private fun executeCallback() {
+        val start = thumbStart / width
+        val end = thumbEnd / width
+        selectionCallback?.onSelectionMoved(start, end)
     }
 
-    private fun determineSelectionRange(x1: Float, x2: Float): Pair<Float, Float> {
-        val offset = thumbWidth
-        val selectionWidth = width - (2 * offset)
-
-        val _x1 = (x1 / selectionWidth) * 100
-        val _x2 = ((x2 - offset) / selectionWidth) * 100
-        return Pair(_x1, _x2)
-    }
-
-    /**
-     * Positions markers in specific positions via percentage values
-     * ranges from 0.0 - 1.0
-     * @param startX percentage value for the start position
-     * @param endX percentage value for the end position
-     */
-    fun updateMarkerPosition(startX: Float, endX: Float) {
+    fun updateMarkers(start: Float, end: Float) {
         post {
-            val thumb1 = getChildAt(0) as VideoSelectionMarkerView
-            val thumb2 = getChildAt(1) as VideoSelectionMarkerView
+            this.thumbStart = start * width
+            this.thumbEnd = end * width
 
-            val offset = thumbWidth
-            val selectionWidth = width - (2 * offset)
-
-            val value1 = startX * selectionWidth
-            val value2 = ((endX) * (selectionWidth)) + offset
-
-            thumb1.selectMarkerPosition(value1)
-            thumb2.selectMarkerPosition(value2)
+            invalidate()
         }
     }
 
     fun updateProgressMarkerPosition(value: Float) {
-        post {
-            val progressMarkerView = getChildAt(2) as VideoProgressMarkerView
+        val progress = value * width
+        progressPosition = progress
+        invalidate()
+    }
 
-            val offset = thumbWidth
-            val selectionWidth = width - (2 * offset)
-            val position = offset + (value * selectionWidth)
-            progressMarkerView.selectMarkerPosition(position)
+    private fun getMinMaxLeft(positionX: Float): Float {
+        return max(0f, min(positionX, thumbEnd - (SIZE * 2)))
+    }
+
+    private fun getMinMaxRight(positionX: Float): Float {
+        return max(thumbStart + (SIZE * 2), min(positionX, width.toFloat()))
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val desiredWidth = 0 + paddingLeft + paddingRight
+        val desiredHeight = 0 + paddingTop + paddingBottom
+
+        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        val widthSize = MeasureSpec.getSize(widthMeasureSpec)
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+        val heightSize = MeasureSpec.getSize(heightMeasureSpec)
+
+        val width: Int = when (widthMode) {
+            MeasureSpec.EXACTLY -> {
+                widthSize
+            }
+            MeasureSpec.AT_MOST -> {
+                min(desiredWidth, widthSize)
+            }
+            else -> {
+                desiredWidth
+            }
         }
+
+        val height: Int = when (heightMode) {
+            MeasureSpec.EXACTLY -> {
+                heightSize
+            }
+            MeasureSpec.AT_MOST -> {
+                min(desiredHeight, heightSize)
+            }
+            else -> {
+                desiredHeight
+            }
+        }
+
+        setMeasuredDimension(width, height)
     }
 }

@@ -17,7 +17,6 @@ import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.echoeyecodes.clipclip.callbacks.VideoConfigurationCallback
 import com.echoeyecodes.clipclip.callbacks.VideoTrimCallback
 import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionCallback
-import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionGravity
 import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionView
 import com.echoeyecodes.clipclip.databinding.ActivityVideoSelectionBinding
 import com.echoeyecodes.clipclip.fragments.dialogfragments.ProgressDialogFragment
@@ -100,16 +99,16 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             }
         }
 
-        viewModel.getTimestampDifferenceLiveData().observe(this, {
+        viewModel.getTimestampDifferenceLiveData().observe(this) {
             durationTextView.text = it
-        })
+        }
 
-        viewModel.getTimestampLiveData().observe(this, {
+        viewModel.getTimestampLiveData().observe(this) {
             timestamp.text = it
-        })
+        }
 
         val positions = viewModel.getMarkerPositions()
-        videoSelectionView.updateMarkerPosition(positions.first, positions.second)
+        videoSelectionView.updateMarkers(positions.first, positions.second)
 
         doneBtn.setOnClickListener { showConfigurationDialog() }
     }
@@ -208,11 +207,10 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
 
     @SuppressLint("SetTextI18n")
     override fun onSelectionMoved(startX: Float, endX: Float) {
-        textView.text = "Start: ${startX.toInt()}% \n End ${endX.toInt()}%"
         viewModel.setVideoTimestamps(startX, endX)
     }
 
-    override fun onSelectionStarted(gravity: VideoSelectionGravity, startX: Float, endX: Float) {
+    override fun onSelectionStarted(startX: Float, endX: Float) {
         viewModel.setVideoTimestamps(startX, endX)
         player?.let {
             viewModel.isPlaying = it.isPlaying
@@ -220,7 +218,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         }
     }
 
-    override fun onSelectionEnded(gravity: VideoSelectionGravity, startX: Float, endX: Float) {
+    override fun onSelectionEnded(startX: Float, endX: Float) {
         player?.let {
             it.seekTo(viewModel.convertToTimestamp(startX))
             viewModel.currentPosition = viewModel.getStartTime()

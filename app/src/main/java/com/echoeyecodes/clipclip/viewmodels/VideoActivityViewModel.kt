@@ -36,7 +36,8 @@ class VideoActivityViewModel(val uri: String, application: Application) :
 
     init {
         duration = getVideoDuration(Uri.parse(uri))
-        setVideoTimestamps(0f, 100f)
+        endTime = duration
+        setVideoTimestamps(0f, 1f)
     }
 
     /*
@@ -108,7 +109,7 @@ class VideoActivityViewModel(val uri: String, application: Application) :
     }
 
     fun convertToTimestamp(value: Float): Long {
-        return ((value / 100) * duration).toLong()
+        return ((value) * duration).toLong()
     }
 
     private fun formatTimestamp(value: Long): String {
