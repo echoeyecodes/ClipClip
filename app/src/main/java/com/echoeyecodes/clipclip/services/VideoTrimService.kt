@@ -44,7 +44,7 @@ class VideoTrimService : Service() {
 
         CoroutineScope(Dispatchers.IO).launch {
             videoTrimManager.startTrim(videoUri, configModel)
-            stopForeground(true)
+            stopSelf()
         }
         return START_REDELIVER_INTENT
     }
