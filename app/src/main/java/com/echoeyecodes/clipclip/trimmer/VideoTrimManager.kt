@@ -46,18 +46,7 @@ class VideoTrimManager(private val context: Context) {
         val format = if (configModel.format == VideoFormat.MP3) {
             " -q:a 0 -map a "
         } else {
-            val sizeValue = when (configModel.quality) {
-                VideoQuality.LOW -> {
-                    38
-                }
-                VideoQuality.MEDIUM -> {
-                    28
-                }
-                else -> {
-                    18
-                }
-            }
-            "-vcodec libx264 -crf $sizeValue"
+            "-vcodec libx264"
         }
         val uris = ArrayList<Uri>()
         for (i in 0 until count) {

@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black">
 
+    <include android:id="@+id/toolbar" layout="@layout/video_selection_toolbar" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar"
+        android:layout_above="@id/options"
+        android:background="@color/neo_black">
+
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/player_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/neo_black"
         app:use_controller="false" />
 
     <LinearLayout
@@ -56,13 +66,6 @@
         android:textColor="@color/white"
         android:visibility="gone" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/done_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:text="Done" />
-
     <RelativeLayout
         android:id="@+id/buffer_progress_container"
         android:layout_width="match_parent"
@@ -79,5 +82,7 @@
             android:layout_centerInParent="true"
             android:indeterminate="true" />
     </RelativeLayout>
-
 </FrameLayout>
+
+    <include android:id="@+id/options" layout="@layout/video_selection_options" />
+</RelativeLayout>

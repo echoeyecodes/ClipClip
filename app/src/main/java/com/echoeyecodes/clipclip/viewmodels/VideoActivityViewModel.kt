@@ -97,6 +97,10 @@ class VideoActivityViewModel(val uri: String, application: Application) :
         }
     }
 
+    fun getDuration():Long{
+        return duration
+    }
+
     fun setVideoTimestamps(startX: Float, endX: Float) {
         val startTime = convertToTimestamp(startX)
         val endTime = convertToTimestamp(endX)

@@ -1,6 +1,5 @@
 package com.echoeyecodes.clipclip.activities
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -15,12 +14,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.echoeyecodes.clipclip.callbacks.VideoConfigurationCallback
+import com.echoeyecodes.clipclip.callbacks.VideoTimestampCallback
 import com.echoeyecodes.clipclip.callbacks.VideoTrimCallback
 import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionCallback
 import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionView
 import com.echoeyecodes.clipclip.databinding.ActivityVideoSelectionBinding
 import com.echoeyecodes.clipclip.fragments.dialogfragments.ProgressDialogFragment
 import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoConfigurationDialogFragment
+import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoTimestampDialogFragment
 import com.echoeyecodes.clipclip.models.VideoConfigModel
 import com.echoeyecodes.clipclip.services.VideoTrimService
 import com.echoeyecodes.clipclip.trimmer.VideoTrimManager
@@ -34,9 +35,11 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.button.MaterialButton
+import kotlin.math.max
+import kotlin.math.min
 
 class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listener,
-    VideoConfigurationCallback, VideoTrimCallback {
+    VideoConfigurationCallback, VideoTrimCallback, VideoTimestampCallback {
     private lateinit var videoTrimManager: VideoTrimManager
     private val binding by lazy { ActivityVideoSelectionBinding.inflate(layoutInflater) }
     private lateinit var textView: TextView
@@ -44,12 +47,15 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     private lateinit var bufferProgressContainer: View
     private lateinit var durationTextView: TextView
     private lateinit var doneBtn: MaterialButton
+    private lateinit var timeBtn: View
+    private lateinit var closeBtn: View
     private lateinit var videoSelectionView: VideoSelectionView
     private var player: ExoPlayer? = null
     private lateinit var playerView: PlayerView
     private lateinit var viewModel: VideoActivityViewModel
     private lateinit var progressDialogFragment: ProgressDialogFragment
     private lateinit var videoConfigurationDialogFragment: VideoConfigurationDialogFragment
+    private lateinit var videoTimestampDialogFragment: VideoTimestampDialogFragment
     private val handler by lazy { Handler(mainLooper) }
 
     private val playerRunnable = object : Runnable {
@@ -65,7 +71,9 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         textView = binding.text
         timestamp = binding.timestamp
         playerView = binding.playerView
-        doneBtn = binding.doneBtn
+        closeBtn = binding.toolbar.closeBtn
+        timeBtn = binding.options.timeBtn
+        doneBtn = binding.toolbar.doneBtn
         bufferProgressContainer = binding.bufferProgressContainer
         durationTextView = binding.totalDuration
 
@@ -78,6 +86,12 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
                 ?: VideoConfigurationDialogFragment.newInstance().apply {
                     this.videoConfigurationCallback = this@VideoActivity
                 }
+        videoTimestampDialogFragment =
+            (supportFragmentManager.findFragmentByTag(VideoTimestampDialogFragment.TAG) as VideoTimestampDialogFragment?)
+                ?: VideoTimestampDialogFragment.newInstance().apply {
+                    this.videoTimestampCallback = this@VideoActivity
+                }
+
         progressDialogFragment =
             (supportFragmentManager.findFragmentByTag(ProgressDialogFragment.TAG) as ProgressDialogFragment?)
                 ?: ProgressDialogFragment.newInstance()
@@ -111,6 +125,8 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         videoSelectionView.updateMarkers(positions.first, positions.second)
 
         doneBtn.setOnClickListener { showConfigurationDialog() }
+        closeBtn.setOnClickListener { onBackPressed() }
+        timeBtn.setOnClickListener { openTimestampFragment() }
     }
 
     private fun initFFMPEGListener() {
@@ -205,7 +221,6 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         player = null
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onSelectionMoved(startX: Float, endX: Float) {
         viewModel.setVideoTimestamps(startX, endX)
     }
@@ -265,13 +280,12 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         videoSelectionView.updateProgressMarkerPosition(viewModel.getProgressMarkerPosition(value))
     }
 
-    override fun onFinish(splitTime: Int, quality: VideoQuality, format: VideoFormat) {
+    override fun onFinish(splitTime: Int, format: VideoFormat) {
         val configModel = VideoConfigModel(
             viewModel.getStartTime(),
             viewModel.getEndTime(),
             splitTime,
-            format,
-            quality
+            format
         )
         viewModel.splitTime = splitTime
         AndroidUtilities.dismissFragment(videoConfigurationDialogFragment)
@@ -305,5 +319,21 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             AndroidUtilities.dismissFragment(progressDialogFragment)
             AndroidUtilities.openShareIntent(ArrayList(uris), this@VideoActivity)
         }
+    }
+
+    private fun openTimestampFragment() {
+        val start = viewModel.getStartTime()
+        val end = viewModel.getEndTime()
+        videoTimestampDialogFragment.setData(start, end)
+        AndroidUtilities.showFragment(supportFragmentManager, videoTimestampDialogFragment)
+    }
+
+    override fun onSumbit(start: Long, end: Long) {
+        AndroidUtilities.dismissFragment(videoTimestampDialogFragment)
+        val duration = viewModel.getDuration()
+        val _start = max(0L, min(duration, start))
+        val _end = max(_start, end)
+
+        videoSelectionView.updateMarkers(_start.toFloat()/duration, _end.toFloat()/duration)
     }
 }

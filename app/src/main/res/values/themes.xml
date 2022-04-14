@@ -215,4 +215,19 @@
     <style name="CustomRadioButtonStyle" parent="Widget.AppCompat.CompoundButton.RadioButton">
         <item name="android:textColor">@color/neo_black</item>
     </style>
+
+    <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
+        <item name="boxCornerRadiusBottomEnd">4dp</item>
+        <item name="boxCornerRadiusBottomStart">4dp</item>
+        <item name="boxCornerRadiusTopEnd">4dp</item>
+        <item name="boxCornerRadiusTopStart">4dp</item>
+        <item name="boxBackgroundColor">@color/inputBoxColorLight</item>
+    </style>
+
+    <style name="TextInputStyle" parent="Widget.AppCompat.EditText">
+        <item name="android:textColor">@color/black</item>
+    </style>
+
 </resources>

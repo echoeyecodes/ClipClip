@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:gravity="center"
+    android:paddingStart="0dp"
+    android:background="@color/neo_black"
+    android:layout_alignParentBottom="true"
+    android:paddingEnd="10dp"
+    tools:showIn="@layout/activity_select_video"
+    android:layout_height="?attr/actionBarSize">
+
+    <ImageButton
+        android:id="@+id/time_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_baseline_av_timer_24"
+        android:padding="10dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="@color/white" />
+
+</LinearLayout>

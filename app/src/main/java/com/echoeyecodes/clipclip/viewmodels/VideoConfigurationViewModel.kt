@@ -7,6 +7,5 @@ import com.echoeyecodes.clipclip.utils.VideoQuality
 
 class VideoConfigurationViewModel(application: Application):AndroidViewModel(application) {
     var splitTime = 30
-    var quality = VideoQuality.HIGH
     var format = VideoFormat.MP4
 }

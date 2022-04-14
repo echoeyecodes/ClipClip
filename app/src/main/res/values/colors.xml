@@ -45,4 +45,6 @@
     <color name="google_color">#DB4437</color>
 
     <color name="notification_unread_color">#0dde5246</color>
+    <color name="inputBoxColorLight">#F2F3F5</color>
+    <color name="inputBoxColorDark">#2C2F33</color>
 </resources>

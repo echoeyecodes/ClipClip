@@ -21,7 +21,6 @@ import com.google.android.material.chip.ChipGroup
 class VideoConfigurationDialogFragment : BaseDialogFragment(), SeekBar.OnSeekBarChangeListener {
 
     private lateinit var seekBarText: TextView
-    private lateinit var radioGroup: RadioGroup
     private lateinit var chipGroup: ChipGroup
     private lateinit var seekbar: SeekBar
     private val viewModel by lazy { ViewModelProvider(this)[VideoConfigurationViewModel::class.java] }
@@ -65,14 +64,12 @@ class VideoConfigurationDialogFragment : BaseDialogFragment(), SeekBar.OnSeekBar
         super.onViewCreated(view, savedInstanceState)
         doneBtn = binding.doneBtn
         seekbar = binding.seekBar
-        radioGroup = binding.qualityRadioGroup
         seekBarText = binding.seekBarText
         chipGroup = binding.formatChipGroup
 
         doneBtn.setOnClickListener {
             videoConfigurationCallback?.onFinish(
                 viewModel.splitTime,
-                viewModel.quality,
                 viewModel.format
             )
         }
@@ -86,37 +83,8 @@ class VideoConfigurationDialogFragment : BaseDialogFragment(), SeekBar.OnSeekBar
             }
         }
 
-        radioGroup.setOnCheckedChangeListener { radioGroup, i ->
-            when (i) {
-                R.id.low -> {
-                    viewModel.quality = (VideoQuality.LOW)
-                }
-                R.id.medium -> {
-                    viewModel.quality = (VideoQuality.MEDIUM)
-                }
-                else -> {
-                    viewModel.quality = (VideoQuality.HIGH)
-                }
-            }
-        }
-
         seekbar.progress = viewModel.splitTime
-        radioGroup.check(getCheckedQuality())
         chipGroup.check(getCheckedFormat())
-    }
-
-    private fun getCheckedQuality(): Int {
-        return when (viewModel.quality) {
-            VideoQuality.LOW -> {
-                R.id.low
-            }
-            VideoQuality.MEDIUM -> {
-                R.id.medium
-            }
-            else -> {
-                R.id.high
-            }
-        }
     }
 
     private fun getCheckedFormat(): Int {
