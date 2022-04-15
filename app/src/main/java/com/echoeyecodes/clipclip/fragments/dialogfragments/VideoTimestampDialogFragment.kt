@@ -27,7 +27,7 @@ class VideoTimestampDialogFragment : BaseDialogFragment() {
         fun newInstance() = VideoTimestampDialogFragment()
     }
 
-    fun setData(startTime: Long, endTime: Long){
+    fun setData(startTime: Long, endTime: Long) {
         arguments = Bundle().apply {
             putLong("start", startTime)
             putLong("end", endTime)
@@ -73,10 +73,10 @@ class VideoTimestampDialogFragment : BaseDialogFragment() {
 
         doneBtn.setOnClickListener { sendTimestamps() }
         startEditText.doOnTextChanged { text, start, before, count ->
-            viewModel.validate(text.toString())
+            viewModel.setStartTime(text.toString())
         }
         endEditText.doOnTextChanged { text, start, before, count ->
-            viewModel.validate(text.toString())
+            viewModel.setEndTime(text.toString())
         }
         viewModel.getValidStatus().observe(this) {
             doneBtn.isEnabled = it
