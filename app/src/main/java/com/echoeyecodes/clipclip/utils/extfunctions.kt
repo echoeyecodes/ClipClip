@@ -43,12 +43,18 @@ fun String.withPrefix(size: Int = 2): String {
     )
 }
 
+//Only use with FFMPEG TRIM
 fun Int.formatTimeToDigits(): String {
     val totalSeconds = this
     val hours = "0".plus(totalSeconds / 60 / 60)
     val minutes = "0".plus((totalSeconds / 60 % 60))
     val seconds = "0".plus((totalSeconds % 60 % 60) % 60)
-    return "${hours.withPrefix()}:${minutes.withPrefix()}:${seconds.withPrefix()}"
+    val milliSeconds = "00".plus((this % 1000))
+    return "${hours.withPrefix()}:${minutes.withPrefix()}:${seconds.withPrefix()}.${
+        milliSeconds.withPrefix(
+            3
+        )
+    }"
 }
 
 fun Long.formatTimeToDigits(): String {
