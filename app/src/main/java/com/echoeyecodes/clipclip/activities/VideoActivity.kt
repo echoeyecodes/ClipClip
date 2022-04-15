@@ -330,9 +330,8 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     override fun onSumbit(start: Long, end: Long) {
         AndroidUtilities.dismissFragment(videoTimestampDialogFragment)
         val duration = viewModel.getDuration()
-        val _start = max(0L, min(duration, start))
-        val _end = max(_start, end)
-
-        videoSelectionView.updateMarkers(_start.toFloat()/duration, _end.toFloat()/duration)
+        val _start = start.toFloat()/duration
+        val _end = min(1.0f, end.toFloat()/duration)
+        videoSelectionView.updateMarkers(_start, _end)
     }
 }
