@@ -11,6 +11,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import com.echoeyecodes.clipclip.R
+import com.echoeyecodes.clipclip.utils.AndroidUtilities
 import java.lang.Math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -97,7 +98,10 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
                 } else {
                     touchPoint = TouchPoint.CENTER
                 }
-                selectionCallback?.onSelectionStarted(thumbStart / width, thumbEnd / width)
+                selectionCallback?.onSelectionStarted(
+                    getThumbStart(),
+                    getThumbEnd()
+                )
                 true
             }
             MotionEvent.ACTION_MOVE -> {
@@ -119,7 +123,10 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
             }
             MotionEvent.ACTION_UP -> {
                 touchPoint = null
-                selectionCallback?.onSelectionEnded(thumbStart / width, thumbEnd / width)
+                selectionCallback?.onSelectionEnded(
+                    getThumbStart(),
+                    getThumbEnd()
+                )
                 true
             }
             else -> false
@@ -156,22 +163,34 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
     }
 
     private fun executeCallback() {
-        val start = thumbStart / width
-        val end = thumbEnd / width
+        val start = getThumbStart()
+        val end = getThumbEnd()
         selectionCallback?.onSelectionMoved(start, end)
+    }
+
+    private fun getThumbStart(): Float {
+        return (thumbStart) / getActualWidth()
+    }
+
+    private fun getThumbEnd(): Float {
+        return (thumbEnd - (SIZE * 2)) / getActualWidth()
+    }
+
+    private fun getActualWidth(): Float {
+        return width - (SIZE * 2)
     }
 
     fun updateMarkers(start: Float, end: Float) {
         post {
-            this.thumbStart = getMinMaxLeft(start * width)
-            this.thumbEnd = getMinMaxRight(end * width)
+            this.thumbStart = getMinMaxLeft(start * getActualWidth())
+            this.thumbEnd = getMinMaxRight((end * getActualWidth()) + (SIZE * 2))
             executeCallback()
             invalidate()
         }
     }
 
     fun updateProgressMarkerPosition(value: Float) {
-        val progress = value * width
+        val progress = SIZE + (value * getActualWidth())
         progressPosition = progress
         invalidate()
     }
