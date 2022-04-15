@@ -181,11 +181,13 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
     }
 
     fun updateMarkers(start: Float, end: Float) {
+        selectionCallback?.onSelectionStarted(getThumbStart(), getThumbEnd())
         post {
             this.thumbStart = getMinMaxLeft(start * getActualWidth())
             this.thumbEnd = getMinMaxRight((end * getActualWidth()) + (SIZE * 2))
             executeCallback()
             invalidate()
+            selectionCallback?.onSelectionEnded(getThumbStart(), getThumbEnd())
         }
     }
 
