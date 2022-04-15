@@ -79,6 +79,11 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
         canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
     }
 
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        this.thumbEnd = w.toFloat()
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val _x = event.rawX
