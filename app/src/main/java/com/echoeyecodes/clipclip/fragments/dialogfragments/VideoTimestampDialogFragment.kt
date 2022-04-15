@@ -9,10 +9,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.echoeyecodes.clipclip.R
 import com.echoeyecodes.clipclip.callbacks.VideoTimestampCallback
 import com.echoeyecodes.clipclip.databinding.FragmentVideoTimestampBinding
+import com.echoeyecodes.clipclip.utils.AndroidUtilities
 import com.echoeyecodes.clipclip.utils.formatDigitsToLong
 import com.echoeyecodes.clipclip.utils.formatTimeToDigits
 import com.echoeyecodes.clipclip.viewmodels.VideoTimestampViewModel
 import com.vicmikhailau.maskededittext.MaskedEditText
+import kotlin.math.max
+import kotlin.math.min
 
 class VideoTimestampDialogFragment : BaseDialogFragment() {
     private lateinit var binding: FragmentVideoTimestampBinding
@@ -87,9 +90,15 @@ class VideoTimestampDialogFragment : BaseDialogFragment() {
     }
 
     private fun sendTimestamps() {
-        val startTime = startEditText.text.toString().formatDigitsToLong()
-        val endTime = endEditText.text.toString().formatDigitsToLong()
-        videoTimestampCallback?.onSumbit(startTime, endTime)
+        var start = startEditText.text.toString().formatDigitsToLong()
+        var end = endEditText.text.toString().formatDigitsToLong()
+
+        if (start > end) {
+            end = start
+        } else if (end < start) {
+            start = end
+        }
+        videoTimestampCallback?.onSumbit(start, end)
         dismiss()
     }
 

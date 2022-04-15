@@ -295,8 +295,10 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             putString("videoUri", viewModel.uri)
         }.build()
         val workRequest = OneTimeWorkRequestBuilder<VideoTrimWorkManager>()
-            .addTag(VideoTrimWorkManager.TAG).setInputData(workData).setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST).build()
-        WorkManager.getInstance(this).enqueueUniqueWork(VideoTrimWorkManager.TAG, ExistingWorkPolicy.KEEP, workRequest)
+            .addTag(VideoTrimWorkManager.TAG).setInputData(workData)
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST).build()
+        WorkManager.getInstance(this)
+            .enqueueUniqueWork(VideoTrimWorkManager.TAG, ExistingWorkPolicy.KEEP, workRequest)
     }
 
     override fun onPlayerError(error: PlaybackException) {
@@ -330,8 +332,8 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     override fun onSumbit(start: Long, end: Long) {
         AndroidUtilities.dismissFragment(videoTimestampDialogFragment)
         val duration = viewModel.getDuration()
-        val _start = start.toFloat()/duration
-        val _end = min(1.0f, end.toFloat()/duration)
+        val _start = start.toFloat() / duration
+        val _end = min(1.0f, end.toFloat() / duration)
         videoSelectionView.updateMarkers(_start, _end)
     }
 }
