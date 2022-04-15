@@ -58,7 +58,6 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
 
     override fun onDraw(canvas: Canvas) {
         //start thumb
-
         canvas.drawLine(thumbStart + SIZE, 0f, thumbStart + SIZE, height.toFloat(), thumbPaint)
 
         //end thumb
@@ -138,10 +137,18 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
         }
     }
 
+    /**
+     * returns true if the touch is between the start thumb
+     * position and end thumb
+     */
     private fun isLeft(positionX: Float): Boolean {
         return (positionX in thumbStart..thumbStart + SIZE)
     }
 
+    /**
+     * returns true if the touch is between the end thumb
+     * position and end thumb
+     */
     private fun isRight(positionX: Float): Boolean {
         return (positionX in thumbEnd - SIZE..thumbEnd)
     }
@@ -155,12 +162,18 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
         invalidate()
     }
 
+    /**
+     * Changes the left position of the selection view
+     */
     private fun resizeLeft(positionX: Float) {
         thumbStart = getMinMaxLeft(positionX)
         executeCallback()
         invalidate()
     }
 
+    /**
+     * Changes the right position of the selection view
+     */
     private fun resizeRight(positionX: Float) {
         thumbEnd = getMinMaxRight(positionX)
         executeCallback()
@@ -173,18 +186,34 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
         selectionCallback?.onSelectionMoved(start, end)
     }
 
+    /**
+     * Returns the percentage value position of the start of the thumb
+     * relative to the draggable region
+     */
     private fun getThumbStart(): Float {
         return (thumbStart) / getActualWidth()
     }
 
+    /**
+     * Returns the percentage value position of the end of the thumb
+     * relative to the draggable region
+     */
     private fun getThumbEnd(): Float {
         return (thumbEnd - (SIZE * 2)) / getActualWidth()
     }
 
+    /**
+     * Returns the width of the draggable region
+     */
     private fun getActualWidth(): Float {
         return width - (SIZE * 2)
     }
 
+    /**
+     * Updates the positions of the start and end thumb
+     * @param start Percentage value for the start of the thumb. Ranges between (0.0 -1.0)
+     * @param end Percentage value for the end of the thumb. Ranges between (0.0 -1.0)
+     */
     fun updateMarkers(start: Float, end: Float) {
         selectionCallback?.onSelectionStarted(getThumbStart(), getThumbEnd())
         post {
@@ -196,16 +225,31 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
         }
     }
 
+    /**
+     * updates the progress stick position in the selection view
+     * @param value between 0.0-1.0 representing the percentage offset from the start
+     * of the selection view to the end
+     */
     fun updateProgressMarkerPosition(value: Float) {
         val progress = SIZE + (value * getActualWidth())
         progressPosition = progress
         invalidate()
     }
 
+    /**
+     * Returns the maximum permissible value of the left thumb
+     * i.e ranges between 0 and the start of the
+     * right thumb
+     */
     private fun getMinMaxLeft(positionX: Float): Float {
         return max(0f, min(positionX, thumbEnd - (SIZE * 2)))
     }
 
+    /**
+     * Returns the maximum permissible value of the right thumb
+     * i.e not exceeding the width of the screen and the end of the
+     * left thumb
+     */
     private fun getMinMaxRight(positionX: Float): Float {
         return max(thumbStart + (SIZE * 2), min(positionX, width.toFloat()))
     }
