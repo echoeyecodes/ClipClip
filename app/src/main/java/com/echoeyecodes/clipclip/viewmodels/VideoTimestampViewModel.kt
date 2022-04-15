@@ -7,7 +7,7 @@ import com.echoeyecodes.clipclip.utils.AndroidUtilities
 
 class VideoTimestampViewModel() : ViewModel() {
     private val isValid = MutableLiveData(false)
-    private val pattern = "^[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\$"
+    private val pattern = "^[0-9][0-9]:[0-9][0-9]:[0-9][0-9]:[0-9][0-9][0-9]\$"
 
     fun getValidStatus(): LiveData<Boolean> {
         return isValid
@@ -15,6 +15,5 @@ class VideoTimestampViewModel() : ViewModel() {
 
     fun validate(text: String) {
         isValid.value = text.matches(Regex(pattern))
-        AndroidUtilities.log(text.matches(Regex(pattern)))
     }
 }

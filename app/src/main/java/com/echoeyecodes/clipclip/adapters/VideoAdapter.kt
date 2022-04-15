@@ -10,10 +10,7 @@ import com.echoeyecodes.clipclip.R
 import com.echoeyecodes.clipclip.callbacks.VideoAdapterCallback
 import com.echoeyecodes.clipclip.databinding.LayoutVideoItemBinding
 import com.echoeyecodes.clipclip.models.VideoModel
-import com.echoeyecodes.clipclip.utils.VideoModelItemCallback
-import com.echoeyecodes.clipclip.utils.convertToDp
-import com.echoeyecodes.clipclip.utils.formatTimeToDigits
-import com.echoeyecodes.clipclip.utils.getScreenSize
+import com.echoeyecodes.clipclip.utils.*
 
 class VideoAdapter(private val callback: VideoAdapterCallback) :
     ListAdapter<VideoModel, VideoAdapter.VideoAdapterViewHolder>(VideoModelItemCallback()) {
@@ -42,7 +39,7 @@ class VideoAdapter(private val callback: VideoAdapterCallback) :
             Glide.with(view).load(model.getVideoUri()).sizeMultiplier(0.5f).override(size)
                 .into(imageView)
             view.setOnClickListener { callback.onVideoSelected(model) }
-            timestampTextView.text = model.duration.formatTimeToDigits()
+            timestampTextView.text = model.duration.formatVideoTime()
         }
     }
 }

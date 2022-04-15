@@ -1,30 +1,9 @@
 package com.echoeyecodes.clipclip.utils
 
-import android.annotation.SuppressLint
-import android.content.ContentResolver
 import android.content.res.Resources
-import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.net.Uri
-import android.provider.OpenableColumns
 import android.util.TypedValue
-import androidx.core.view.doOnLayout
-import androidx.recyclerview.widget.RecyclerView
 import com.echoeyecodes.clipclip.models.VideoConfigModel
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import java.io.IOException
-import java.net.URL
-import java.text.DecimalFormat
-import java.text.SimpleDateFormat
-import java.time.Duration
-import java.time.Instant
-import java.util.*
-import java.util.regex.Pattern
 import kotlin.math.max
 
 
@@ -55,10 +34,10 @@ private fun delimitTime(value: Int, suffix: String): String {
     }
 }
 
-fun String.withPrefix(): String {
+fun String.withPrefix(size: Int = 2): String {
     return this.substring(
         max(
-            this.length - 2,
+            this.length - size,
             0
         )
     )
@@ -77,6 +56,19 @@ fun Long.formatTimeToDigits(): String {
     val hours = "0".plus(totalSeconds / 60 / 60)
     val minutes = "0".plus((totalSeconds / 60 % 60))
     val seconds = "0".plus((totalSeconds % 60 % 60) % 60)
+    val milliSeconds = "00".plus((this % 1000))
+    return "${hours.withPrefix()}:${minutes.withPrefix()}:${seconds.withPrefix()}:${
+        milliSeconds.withPrefix(
+            3
+        )
+    }"
+}
+
+fun Long.formatVideoTime(): String {
+    val totalSeconds = this / 1000
+    val hours = "0".plus(totalSeconds / 60 / 60)
+    val minutes = "0".plus((totalSeconds / 60 % 60))
+    val seconds = "0".plus((totalSeconds % 60 % 60) % 60)
     return "${hours.withPrefix()}:${minutes.withPrefix()}:${seconds.withPrefix()}"
 }
 
@@ -85,9 +77,9 @@ fun String.formatDigitsToLong(): Long {
     val hours = timeArray[0].toInt()
     val minutes = timeArray[1].toInt()
     val seconds = timeArray[2].toInt()
+    val milliSeconds = timeArray[3].toInt()
 
-    val total = ((hours * 60 * 60) + (minutes * 60) + seconds) * 1000L
-    return total
+    return (((hours * 60 * 60) + (minutes * 60) + seconds) * 1000L) + milliSeconds
 }
 
 fun Long.toSeconds(): Int {

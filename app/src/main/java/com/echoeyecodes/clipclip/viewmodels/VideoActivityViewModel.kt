@@ -97,7 +97,7 @@ class VideoActivityViewModel(val uri: String, application: Application) :
         }
     }
 
-    fun getDuration():Long{
+    fun getDuration(): Long {
         return duration
     }
 
@@ -121,7 +121,12 @@ class VideoActivityViewModel(val uri: String, application: Application) :
         val hours = "0".plus(totalSeconds / 60 / 60)
         val minutes = "0".plus((totalSeconds / 60 % 60))
         val seconds = "0".plus((totalSeconds % 60 % 60) % 60)
-        return "${hours.withPrefix()}:${minutes.withPrefix()}:${seconds.withPrefix()}"
+        val milliSeconds = "00".plus((value % 1000))
+        return "${hours.withPrefix()}:${minutes.withPrefix()}:${seconds.withPrefix()}:${
+            milliSeconds.withPrefix(
+                3
+            )
+        }"
     }
 
     fun getTimestampLiveData(): LiveData<String> {
