@@ -9,14 +9,15 @@
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/colorPrimary</item>
         <item name="colorSecondaryVariant">@color/colorPrimary</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">false</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
+        <item name="android:windowBackground">@color/neo_black</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="imageButtonStyle">@style/ImageButtonStyle</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogStyle</item>
         <!-- Customize your theme here. -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="snackbarStyle">@style/CustomSnackBarStyle</item>
         <item name="snackbarButtonStyle">@style/CustomSnackBarButtonStyle</item>
     </style>
@@ -44,25 +45,16 @@
         <item name="colorOnSurface">@color/colorPrimary</item>
     </style>
 
-
     <style name="ImageButtonStyle" parent="Widget.AppCompat.ImageButton">
-        <item name="android:tint">@color/neo_black</item>
+        <item name="android:tint">@color/white</item>
     </style>
 
     <style name="BottomSheetDialogStyle" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/BottomSheetDialog</item>
     </style>
 
-    <style name="BorderedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="android:textColor">@color/colorPrimary</item>
-        <item name="cornerRadius">5dp</item>
-        <item name="strokeWidth">1dp</item>
-        <item name="android:paddingTop">15dp</item>
-        <item name="android:paddingBottom">15dp</item>
-        <item name="strokeColor">@color/colorPrimary</item>
-        <item name="background">@android:color/transparent</item>
-        <item name="rippleColor">@color/grey</item>
-        <item name="android:elevation">0dp</item>
+    <style name="CustomBottomSheet" parent="">
+        <item name="android:background">@drawable/drawable_bottom_sheet_dark</item>
     </style>
 
     <style name="InputBottomSheetDialogStyle" parent="BottomSheetDialogStyle">
@@ -74,10 +66,6 @@
     <style name="BottomSheetDialog" parent="Widget.MaterialComponents.BottomSheet.Modal">
         <item name="shapeAppearanceOverlay">@style/BottomSheetShapeAppearance</item>
         <item name="backgroundTint">@android:color/transparent</item>
-    </style>
-
-    <style name="CustomBottomSheet" parent="">
-        <item name="android:background">@drawable/drawable_bottom_sheet</item>
     </style>
 
     <style name="BottomSheetShapeAppearance" parent="">
@@ -92,45 +80,46 @@
     <style name="BottomNavigationStyle" parent="Widget.Design.BottomNavigationView">
         <item name="itemIconTint">@color/bottom_navigation_view_selected_state</item>
         <item name="itemTextColor">@color/bottom_navigation_view_selected_state</item>
-        <item name="backgroundTint">@color/white</item>
+        <item name="backgroundTint">@color/neo_black</item>
     </style>
 
 
     <style name="Bold" parent="Widget.MaterialComponents.TextView">
         <item name="android:fontFamily">@font/open_sans_bold</item>
         <item name="android:textSize">20sp</item>
-        <item name="drawableTint">@color/neo_black</item>
-        <item name="android:textColor">@color/neo_black</item>
+        <item name="drawableTint">@color/white</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="Light" parent="Widget.MaterialComponents.TextView">
         <item name="android:fontFamily">@font/open_sans_light</item>
         <item name="android:textSize">14sp</item>
-        <item name="drawableTint">@color/neo_black</item>
-        <item name="android:textColor">@color/neo_black</item>
+        <item name="drawableTint">@color/white</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="Regular" parent="Widget.MaterialComponents.TextView">
         <item name="android:fontFamily">@font/open_sans_regular</item>
         <item name="android:textSize">14sp</item>
-        <item name="drawableTint">@color/neo_black</item>
-        <item name="android:textColor">@color/neo_black</item>
+        <item name="drawableTint">@color/white</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
 
     <style name="SemiBold" parent="Widget.MaterialComponents.TextView">
         <item name="android:fontFamily">@font/fira_sans_medium</item>
         <item name="android:textSize">18sp</item>
-        <item name="drawableTint">@color/neo_black</item>
-        <item name="android:textColor">@color/neo_black</item>
+        <item name="drawableTint">@color/white</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="Medium" parent="Widget.MaterialComponents.TextView">
         <item name="android:fontFamily">@font/open_sans_semibold</item>
         <item name="android:textSize">18sp</item>
-        <item name="drawableTint">@color/neo_black</item>
-        <item name="android:textColor">@color/neo_black</item>
+        <item name="drawableTint">@color/white</item>
+        <item name="android:textColor">@color/white</item>
     </style>
+
 
     <style name="RoundButton" parent="Widget.MaterialComponents.Button">
         <item name="elevation">0dp</item>
@@ -142,24 +131,24 @@
     </style>
 
 
+
     <style name="MovableIndicatorStyle">
-        <item name="android:backgroundTint">@color/black</item>
+        <item name="android:backgroundTint">@color/white</item>
     </style>
 
     <style name="ReplyHeaderStyle">
-        <item name="cardBackgroundColor">@color/reply_background_light</item>
+        <item name="cardBackgroundColor">@color/divider_color</item>
     </style>
 
     <style name="RegularEditText" parent="Widget.AppCompat.EditText">
         <item name="android:background">@null</item>
         <item name="android:textColorHint">@color/grey</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/white</item>
         <item name="hintTextAppearance">@style/Regular</item>
         <item name="android:textAppearance">@style/Regular</item>
     </style>
-
     <style name="AlertDialogStyle" parent="">
-        <item name="android:background">@drawable/drawable_alert_dialog_inset_light</item>
+        <item name="android:background">@drawable/drawable_alert_dialog_inset_dark</item>
         <item name="android:insetLeft">20dp</item>
         <item name="android:insetRight">20dp</item>
     </style>
@@ -178,7 +167,7 @@
     </style>
 
     <style name="LoadingStyle" parent="">
-        <item name="android:background">@color/white</item>
+        <item name="android:background">@color/neo_black</item>
     </style>
 
     <style name="SearchEditTextStyle" parent="RegularEditText">
@@ -190,30 +179,65 @@
 
     <style name="MomentTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="android:layout_marginTop">10dp</item>
-        <item name="android:layout_marginBottom">10dp</item>
         <item name="android:gravity">top|start</item>
+        <item name="android:layout_marginBottom">10dp</item>
+    </style>
+
+    <style name="BorderedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="cornerRadius">5dp</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="android:paddingTop">15dp</item>
+        <item name="android:paddingBottom">15dp</item>
+        <item name="strokeColor">@color/colorPrimary</item>
+        <item name="background">@android:color/transparent</item>
+        <item name="rippleColor">@color/grey</item>
+        <item name="android:elevation">0dp</item>
     </style>
 
     <style name="Divider" parent="">
         <item name="android:background">@color/divider_light</item>
     </style>
 
+    <style name="SpotlightCollapsingToolbar" parent="Widget.Design.CollapsingToolbar">
+        <item name="contentScrim">@color/neo_black</item>
+        <item name="statusBarScrim">@color/neo_black</item>
+    </style>
+
+    <style name="ThemeRadioButtonStyle" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:layoutDirection">rtl</item>
+        <item name="android:textAlignment">textStart</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:fontFamily">@font/open_sans_regular</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">10dp</item>
+        <item name="android:textSize">16dp</item>
+    </style>
+
     <style name="ViewStyle" parent="">
-        <item name="android:background">@color/white</item>
+        <item name="android:background">@color/neo_black</item>
     </style>
 
     <style name="EventBottomSheetStyle" parent="">
-        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardBackgroundColor">@color/neo_black</item>
     </style>
 
-
-    <style name="SpotlightCollapsingToolbar" parent="Widget.Design.CollapsingToolbar">
-        <item name="contentScrim">@color/white</item>
-        <item name="statusBarScrim">@color/white</item>
+    <style name="SeeMoreButton" parent="RoundButton">
+        <item name="android:backgroundTint">@color/divider_dark</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:stateListAnimator">@null</item>
     </style>
 
-    <style name="CustomRadioButtonStyle" parent="Widget.AppCompat.CompoundButton.RadioButton">
-        <item name="android:textColor">@color/neo_black</item>
+    <style name="SearchFragmentCardView" parent="">
+        <item name="cardCornerRadius">4dp</item>
+        <item name="contentPadding">0dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="cardBackgroundColor">@color/shot_overlay</item>
+    </style>
+
+    <style name="CustomRadioButtonStyle" parent="">
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
@@ -223,11 +247,11 @@
         <item name="boxCornerRadiusBottomStart">4dp</item>
         <item name="boxCornerRadiusTopEnd">4dp</item>
         <item name="boxCornerRadiusTopStart">4dp</item>
-        <item name="boxBackgroundColor">@color/inputBoxColorLight</item>
+        <item name="boxBackgroundColor">@color/inputBoxColorDark</item>
     </style>
 
     <style name="TextInputStyle" parent="Widget.AppCompat.EditText">
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
 </resources>
