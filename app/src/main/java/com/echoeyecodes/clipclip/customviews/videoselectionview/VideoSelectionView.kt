@@ -57,14 +57,8 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
     }
 
     override fun onDraw(canvas: Canvas) {
-        //start thumb
-        canvas.drawLine(thumbStart + SIZE, 0f, thumbStart + SIZE, height.toFloat(), thumbPaint)
-
-        //end thumb
-        canvas.drawLine((thumbEnd - SIZE), 0f, (thumbEnd - SIZE), height.toFloat(), thumbPaint)
-
-        //progress line
-        canvas.drawLine(progressPosition, 0f, progressPosition, height.toFloat(), progressPaint)
+        //view background
+        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
 
         //round rect between start of thumb and end of thumb
         canvas.drawRoundRect(
@@ -74,8 +68,14 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
             selectionPaint
         )
 
-        //view background
-        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+        //start thumb
+        canvas.drawLine(thumbStart + SIZE, 0f, thumbStart + SIZE, height.toFloat(), thumbPaint)
+
+        //end thumb
+        canvas.drawLine((thumbEnd - SIZE), 0f, (thumbEnd - SIZE), height.toFloat(), thumbPaint)
+
+        //progress line
+        canvas.drawLine(progressPosition, 0f, progressPosition, height.toFloat(), progressPaint)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
