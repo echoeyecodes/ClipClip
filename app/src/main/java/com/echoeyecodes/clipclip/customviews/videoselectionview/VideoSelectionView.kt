@@ -11,7 +11,6 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
 import com.echoeyecodes.clipclip.R
-import com.echoeyecodes.clipclip.utils.AndroidUtilities
 import java.lang.Math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -36,6 +35,7 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
         strokeWidth = 6f
         color = Color.WHITE
         style = Paint.Style.STROKE
+        isAntiAlias = true
     }
     private val thumbPaint = Paint().apply {
         color = Color.WHITE
@@ -51,6 +51,9 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
     private var thumbEnd = 0f
     private var progressPosition = 0f
     var selectionCallback: VideoSelectionCallback? = null
+    private var h = 0f
+    private var w = 0f
+    private var strokeOffset = 2f
 
     companion object {
         const val SIZE = 80f
@@ -58,29 +61,32 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
 
     override fun onDraw(canvas: Canvas) {
         //view background
-        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+        canvas.drawRect(0f, 0f, w, h, paint)
 
         //round rect between start of thumb and end of thumb
         canvas.drawRoundRect(
-            thumbStart, 0f, thumbEnd, bottom.toFloat() - 42,
+            thumbStart + strokeOffset, strokeOffset, thumbEnd - strokeOffset, h - strokeOffset,
             16f,
             16f,
             selectionPaint
         )
+        canvas.save()
 
         //start thumb
-        canvas.drawLine(thumbStart + SIZE, 0f, thumbStart + SIZE, height.toFloat(), thumbPaint)
+        canvas.drawLine(thumbStart + SIZE, 0f, thumbStart + SIZE, h, thumbPaint)
 
         //end thumb
-        canvas.drawLine((thumbEnd - SIZE), 0f, (thumbEnd - SIZE), height.toFloat(), thumbPaint)
+        canvas.drawLine((thumbEnd - SIZE), 0f, (thumbEnd - SIZE), h, thumbPaint)
 
         //progress line
-        canvas.drawLine(progressPosition, 0f, progressPosition, height.toFloat(), progressPaint)
+        canvas.drawLine(progressPosition, 0f, progressPosition, h, progressPaint)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         this.thumbEnd = w.toFloat()
+        this.h = h.toFloat()
+        this.w = w.toFloat()
     }
 
     @SuppressLint("ClickableViewAccessibility")
