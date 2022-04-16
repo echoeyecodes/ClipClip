@@ -2,7 +2,6 @@ package com.echoeyecodes.clipclip.activities
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Parcelable
@@ -23,7 +22,6 @@ import com.echoeyecodes.clipclip.databinding.ActivityVideoSelectionBinding
 import com.echoeyecodes.clipclip.fragments.dialogfragments.ProgressDialogFragment
 import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoConfigurationDialogFragment
 import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoTimestampDialogFragment
-import com.echoeyecodes.clipclip.models.VideoConfigModel
 import com.echoeyecodes.clipclip.trimmer.VideoTrimManager
 import com.echoeyecodes.clipclip.utils.*
 import com.echoeyecodes.clipclip.viewmodels.VideoActivityViewModel
@@ -282,17 +280,14 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     }
 
     override fun onFinish(splitTime: Int, format: VideoFormat) {
-        val configModel = VideoConfigModel(
-            viewModel.getStartTime(),
-            viewModel.getEndTime(),
-            splitTime,
-            format
-        )
         viewModel.splitTime = splitTime
         AndroidUtilities.dismissFragment(videoConfigurationDialogFragment)
         val workData = Data.Builder().apply {
-            putString("videoConfig", configModel.serialize())
             putString("videoUri", viewModel.uri)
+            putLong("startTime", viewModel.getStartTime())
+            putLong("endTime", viewModel.getEndTime())
+            putInt("splitTime", viewModel.splitTime)
+            putString("format", format.extension)
         }.build()
         val workRequest = OneTimeWorkRequestBuilder<VideoTrimWorkManager>()
             .addTag(VideoTrimWorkManager.TAG).setInputData(workData)

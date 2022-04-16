@@ -10,9 +10,10 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.echoeyecodes.clipclip.R
 import com.echoeyecodes.clipclip.activities.VideoActivity
+import com.echoeyecodes.clipclip.models.VideoConfigModel
 import com.echoeyecodes.clipclip.receivers.VideoTrimBroadcastReceiver
 import com.echoeyecodes.clipclip.trimmer.VideoTrimManager
-import com.echoeyecodes.clipclip.utils.toVideoConfigModel
+import com.echoeyecodes.clipclip.utils.VideoFormat
 import kotlinx.coroutines.*
 import java.lang.Exception
 
@@ -55,10 +56,19 @@ class VideoTrimWorkManager(context: Context, workerParams: WorkerParameters) :
         return withContext(Dispatchers.IO) {
             try {
                 val videoUri = inputData.getString("videoUri")!!
-                val configModel = inputData.getString("videoConfig")!!.toVideoConfigModel()
-                videoTrimManager.startTrim(videoUri, configModel)
+                val startTime = inputData.getLong("startTime", 0L)
+                val endTime = inputData.getLong("endTime", 0L)
+                val splitTime = inputData.getInt("splitTime", 0)
+                val _format = inputData.getString("format")
+                val format = if (_format == ".mp3") {
+                    VideoFormat.MP3
+                } else VideoFormat.MP4
+                videoTrimManager.startTrim(
+                    videoUri,
+                    VideoConfigModel(startTime, endTime, splitTime, format)
+                )
                 Result.success()
-            }catch (exception: Exception){
+            } catch (exception: Exception) {
                 Result.failure()
             }
         }
