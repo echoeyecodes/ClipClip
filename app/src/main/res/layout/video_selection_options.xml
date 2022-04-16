@@ -5,10 +5,8 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:gravity="center"
-    android:paddingStart="0dp"
     android:background="@color/neo_black"
     android:layout_alignParentBottom="true"
-    android:paddingEnd="10dp"
     tools:showIn="@layout/activity_select_video"
     android:layout_height="?attr/actionBarSize">
 
