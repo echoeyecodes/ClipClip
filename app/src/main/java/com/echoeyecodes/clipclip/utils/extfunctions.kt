@@ -2,8 +2,6 @@ package com.echoeyecodes.clipclip.utils
 
 import android.content.res.Resources
 import android.util.TypedValue
-import com.echoeyecodes.clipclip.models.VideoConfigModel
-import com.google.gson.Gson
 import kotlin.math.max
 
 
@@ -90,14 +88,4 @@ fun String.formatDigitsToLong(): Long {
 
 fun Long.toSeconds(): Int {
     return (this.toFloat() / 1000).toInt()
-}
-
-fun String.toVideoConfigModel(): VideoConfigModel {
-    val gson = Gson()
-    return gson.fromJson(this, VideoConfigModel::class.java)
-}
-
-fun VideoConfigModel.serialize(): String {
-    val gson = Gson()
-    return gson.toJson(this)
 }
