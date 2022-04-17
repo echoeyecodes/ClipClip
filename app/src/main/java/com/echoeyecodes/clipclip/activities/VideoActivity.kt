@@ -102,7 +102,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             selectionCallback = this@VideoActivity
         }
 
-        binding.root.setOnClickListener {
+        binding.playerContainer.setOnClickListener {
             player?.let {
                 if (it.isPlaying) {
                     pauseVideo()
