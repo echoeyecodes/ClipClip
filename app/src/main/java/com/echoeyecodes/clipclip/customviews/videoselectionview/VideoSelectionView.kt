@@ -145,7 +145,7 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
 
     /**
      * returns true if the touch is between the start thumb
-     * position and end thumb
+     * position plus width of the thumb
      */
     private fun isLeft(positionX: Float): Boolean {
         return (positionX in thumbStart..thumbStart + SIZE)
@@ -153,7 +153,7 @@ class VideoSelectionView(context: Context, attributeSet: AttributeSet) :
 
     /**
      * returns true if the touch is between the end thumb
-     * position and end thumb
+     * position minus width of the thumb
      */
     private fun isRight(positionX: Float): Boolean {
         return (positionX in thumbEnd - SIZE..thumbEnd)
