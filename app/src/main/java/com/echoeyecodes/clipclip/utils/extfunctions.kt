@@ -42,8 +42,8 @@ fun String.withPrefix(size: Int = 2): String {
 }
 
 //Only use with FFMPEG TRIM
-fun Int.formatTimeToDigits(): String {
-    val totalSeconds = this
+fun Long.formatTimeToFFMPEGTimeDigits(): String {
+    val totalSeconds = this / 1000
     val hours = "0".plus(totalSeconds / 60 / 60)
     val minutes = "0".plus((totalSeconds / 60 % 60))
     val seconds = "0".plus((totalSeconds % 60 % 60) % 60)
@@ -86,12 +86,12 @@ fun String.formatDigitsToLong(): Long {
     return (((hours * 60 * 60) + (minutes * 60) + seconds) * 1000L) + milliSeconds
 }
 
-fun Long.toSeconds(): Int {
-    return (this.toFloat() / 1000).toInt()
+fun Long.toSeconds(): Long {
+    return (this / 1000)
 }
 
-fun String.toVideoQuality(): VideoQuality{
-    return when(this){
+fun String.toVideoQuality(): VideoQuality {
+    return when (this) {
         "low" -> VideoQuality.LOW
         "medium" -> VideoQuality.MEDIUM
         else -> VideoQuality.HIGH

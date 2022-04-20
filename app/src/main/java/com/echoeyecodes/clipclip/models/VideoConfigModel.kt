@@ -8,13 +8,13 @@ import kotlin.math.ceil
 class VideoConfigModel(
     val startTime: Long,
     val endTime: Long,
-    val splitTime: Int,
+    val splitTime: Long,
     val format: VideoFormat,
     val quality: VideoQuality
 ) : Serializable {
 
     fun getSplitCount(): Int {
-        val timeDifference = (endTime - startTime).toFloat() / 1000 / splitTime
+        val timeDifference = (endTime - startTime).toFloat() / splitTime
         return ceil(timeDifference).toInt()
     }
 }

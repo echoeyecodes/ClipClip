@@ -86,7 +86,7 @@ class VideoConfigurationDialogFragment : BaseDialogFragment(), SeekBar.OnSeekBar
             }
         }
 
-        seekbar.progress = viewModel.splitTime
+        seekbar.progress = (viewModel.splitTime / 1000).toInt()
         chipGroup.check(getCheckedFormat())
         radioGroup.check(getCheckedQuality())
 
@@ -132,7 +132,7 @@ class VideoConfigurationDialogFragment : BaseDialogFragment(), SeekBar.OnSeekBar
 
     @SuppressLint("SetTextI18n")
     override fun onProgressChanged(p0: SeekBar, p1: Int, p2: Boolean) {
-        viewModel.splitTime = (p1)
+        viewModel.splitTime = (p1 * 1000L)
         seekBarText.text = "Video would be split to $p1 seconds for every chunk"
     }
 

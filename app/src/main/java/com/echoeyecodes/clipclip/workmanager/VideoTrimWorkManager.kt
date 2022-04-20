@@ -59,7 +59,7 @@ class VideoTrimWorkManager(context: Context, workerParams: WorkerParameters) :
                 val videoUri = inputData.getString("videoUri")!!
                 val startTime = inputData.getLong("startTime", 0L)
                 val endTime = inputData.getLong("endTime", 0L)
-                val splitTime = inputData.getInt("splitTime", 0)
+                val splitTime = inputData.getLong("splitTime", 0L)
                 val _format = inputData.getString("format")
                 val quality = (inputData.getString("quality") ?: "high").toVideoQuality()
                 val format = if (_format == ".mp3") {
