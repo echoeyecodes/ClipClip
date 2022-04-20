@@ -124,6 +124,7 @@ class VideoTrimManager(private val context: Context) {
         commandString: String
     ) {
         try {
+            AndroidUtilities.log(commandString)
             val session = FFmpegKit.execute(commandString)
             AndroidUtilities.log("FFMPEG process exited with state ${session.state} and return code ${session.returnCode}")
             val returnCode = session.returnCode

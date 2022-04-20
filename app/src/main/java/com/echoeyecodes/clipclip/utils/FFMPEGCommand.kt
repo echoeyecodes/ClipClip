@@ -46,10 +46,16 @@ class FFMPEGCommand private constructor(val command: String) {
 
         fun quality(qty: VideoQuality): Builder {
             val scale = when (qty) {
+                VideoQuality.VERY_LOW -> {
+                    "-vf scale=trunc(iw/8)*2:trunc(ih/8)*2"
+                }
                 VideoQuality.LOW -> {
-                    "-vf scale=trunc(iw/4)*2:trunc(ih/4)*2"
+                    "-vf scale=trunc(iw/6)*2:trunc(ih/6)*2"
                 }
                 VideoQuality.MEDIUM -> {
+                    "-vf scale=trunc(iw/4)*2:trunc(ih/4)*2"
+                }
+                VideoQuality.HIGH -> {
                     "-vf scale=trunc(iw/2)*2:trunc(ih/2)*2"
                 }
                 else -> {

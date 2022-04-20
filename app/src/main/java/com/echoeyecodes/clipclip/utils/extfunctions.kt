@@ -92,8 +92,10 @@ fun Long.toSeconds(): Long {
 
 fun String.toVideoQuality(): VideoQuality {
     return when (this) {
+        "very_low" -> VideoQuality.VERY_LOW
         "low" -> VideoQuality.LOW
         "medium" -> VideoQuality.MEDIUM
-        else -> VideoQuality.HIGH
+        "high" -> VideoQuality.HIGH
+        else -> VideoQuality.NORMAL
     }
 }

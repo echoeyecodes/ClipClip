@@ -92,14 +92,20 @@ class VideoConfigurationDialogFragment : BaseDialogFragment(), SeekBar.OnSeekBar
 
         radioGroup.setOnCheckedChangeListener { radioGroup, i ->
             when (i) {
+                R.id.very_low -> {
+                    viewModel.quality = (VideoQuality.VERY_LOW)
+                }
                 R.id.low -> {
                     viewModel.quality = (VideoQuality.LOW)
                 }
                 R.id.medium -> {
                     viewModel.quality = (VideoQuality.MEDIUM)
                 }
-                else -> {
+                R.id.high -> {
                     viewModel.quality = (VideoQuality.HIGH)
+                }
+                else -> {
+                    viewModel.quality = (VideoQuality.NORMAL)
                 }
             }
         }
@@ -107,14 +113,20 @@ class VideoConfigurationDialogFragment : BaseDialogFragment(), SeekBar.OnSeekBar
 
     private fun getCheckedQuality(): Int {
         return when (viewModel.quality) {
+            VideoQuality.VERY_LOW -> {
+                R.id.very_low
+            }
             VideoQuality.LOW -> {
                 R.id.low
             }
             VideoQuality.MEDIUM -> {
                 R.id.medium
             }
-            else -> {
+            VideoQuality.HIGH -> {
                 R.id.high
+            }
+            else -> {
+                R.id.normal
             }
         }
     }

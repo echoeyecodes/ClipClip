@@ -61,7 +61,7 @@ class VideoTrimWorkManager(context: Context, workerParams: WorkerParameters) :
                 val endTime = inputData.getLong("endTime", 0L)
                 val splitTime = inputData.getLong("splitTime", 0L)
                 val _format = inputData.getString("format")
-                val quality = (inputData.getString("quality") ?: "high").toVideoQuality()
+                val quality = (inputData.getString("quality") ?: "normal").toVideoQuality()
                 val format = if (_format == ".mp3") {
                     VideoFormat.MP3
                 } else VideoFormat.MP4
