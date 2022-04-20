@@ -20,7 +20,7 @@ import java.io.File
 
 class VideoTrimManager(private val context: Context) {
     private val callbacks = ArrayList<VideoTrimCallback>()
-    var shouldTerminate = false
+    private var shouldTerminate = false
 
     fun addTrimCallback(callback: VideoTrimCallback) {
         this.callbacks.add(callback)
@@ -46,7 +46,18 @@ class VideoTrimManager(private val context: Context) {
         val format = if (configModel.format == VideoFormat.MP3) {
             " -q:a 0 -map a "
         } else {
-            "-vcodec libx264"
+            val scale = when (configModel.quality) {
+                VideoQuality.LOW -> {
+                    "-vf scale=trunc(iw/4)*2:trunc(ih/4)*2"
+                }
+                VideoQuality.MEDIUM -> {
+                    "-vf scale=trunc(iw/2)*2:trunc(ih/2)*2"
+                }
+                else -> {
+                    ""
+                }
+            }
+            "-vcodec libx264 $scale"
         }
         val uris = ArrayList<Uri>()
         for (i in 0 until count) {
@@ -64,6 +75,7 @@ class VideoTrimManager(private val context: Context) {
 
             if (configModel.splitTime + start < configModel.endTime) {
                 val commandString = format
+                AndroidUtilities.log(commandString)
                 if (start >= configModel.endTime.toSeconds()) {
                     break
                 }
@@ -147,7 +159,7 @@ class VideoTrimManager(private val context: Context) {
         AndroidUtilities.log(oUri.toString())
 
         try {
-            val session = FFmpegKit.execute(" $startTime -i $iUri $splitTime $commandString $oUri")
+            val session = FFmpegKit.execute(" $startTime $splitTime -i $iUri $commandString $oUri")
             AndroidUtilities.log("FFMPEG process exited with state ${session.state} and return code ${session.returnCode}")
             val returnCode = session.returnCode
             if (ReturnCode.isSuccess(returnCode)) {

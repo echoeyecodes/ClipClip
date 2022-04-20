@@ -8,7 +8,7 @@ fun getScreenSize():Pair<Int, Int>{
 }
 
 
-enum class VideoQuality(name: String) {
+enum class VideoQuality(val qName: String) {
     LOW("low"),
     MEDIUM("medium"),
     HIGH("high")

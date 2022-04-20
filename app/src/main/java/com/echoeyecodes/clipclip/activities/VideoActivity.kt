@@ -279,7 +279,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         videoSelectionView.updateProgressMarkerPosition(viewModel.getProgressMarkerPosition(value))
     }
 
-    override fun onFinish(splitTime: Int, format: VideoFormat) {
+    override fun onFinish(splitTime: Int, quality: VideoQuality, format: VideoFormat) {
         viewModel.splitTime = splitTime
         AndroidUtilities.dismissFragment(videoConfigurationDialogFragment)
         val workData = Data.Builder().apply {
@@ -287,6 +287,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             putLong("startTime", viewModel.getStartTime())
             putLong("endTime", viewModel.getEndTime())
             putInt("splitTime", viewModel.splitTime)
+            putString("quality", quality.qName)
             putString("format", format.extension)
         }.build()
         val workRequest = OneTimeWorkRequestBuilder<VideoTrimWorkManager>()

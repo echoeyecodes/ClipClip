@@ -2,6 +2,7 @@ package com.echoeyecodes.clipclip.viewmodels
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.ContentUris
 import android.provider.MediaStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -49,7 +50,12 @@ class SelectionVideoActivityViewModel(application: Application) : AndroidViewMod
                     val duration = cursor.getLong(cursor.getColumnIndex(projection[4]))
                     val path = cursor.getString(cursor.getColumnIndex(projection[3]))
 
-                    _videoList.add(VideoModel(id, title, path, duration))
+                    _videoList.add(VideoModel(id, title, path, duration).apply {
+                        videoUri = ContentUris.withAppendedId(
+                            MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                            id
+                        )
+                    })
                 }
                 cursor.close()
                 videoData.postValue(_videoList)

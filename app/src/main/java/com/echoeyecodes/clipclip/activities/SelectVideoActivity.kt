@@ -28,7 +28,7 @@ import com.echoeyecodes.clipclip.viewmodels.SelectionVideoActivityViewModel
 class SelectVideoActivity : AppCompatActivity(), VideoAdapterCallback {
     private val binding by lazy { ActivitySelectVideoBinding.inflate(layoutInflater) }
     private lateinit var recyclerView: RecyclerView
-    private lateinit var closeBtn:View
+    private lateinit var closeBtn: View
     private val requiredPermissions = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -55,9 +55,9 @@ class SelectVideoActivity : AppCompatActivity(), VideoAdapterCallback {
         recyclerView.addItemDecoration(itemDecoration)
         recyclerView.adapter = adapter
 
-        viewModel.getVideosLiveData().observe(this, {
+        viewModel.getVideosLiveData().observe(this) {
             adapter.submitList(it)
-        })
+        }
         closeBtn.setOnClickListener { finish() }
         checkDataAccessPermissions()
     }
@@ -80,9 +80,10 @@ class SelectVideoActivity : AppCompatActivity(), VideoAdapterCallback {
     }
 
     override fun onVideoSelected(model: VideoModel) {
-        val selectedUrl = model.getVideoUri()
-        AndroidUtilities.log(selectedUrl.toString())
-        ActivityUtil.startVideoActivity(this, selectedUrl.toString(), model.duration)
+        val selectedUrl = model.videoUri
+        selectedUrl?.let {
+            ActivityUtil.startVideoActivity(this, it.toString(), model.duration)
+        }
     }
 
     override fun onRequestPermissionsResult(

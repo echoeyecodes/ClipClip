@@ -89,3 +89,11 @@ fun String.formatDigitsToLong(): Long {
 fun Long.toSeconds(): Int {
     return (this.toFloat() / 1000).toInt()
 }
+
+fun String.toVideoQuality(): VideoQuality{
+    return when(this){
+        "low" -> VideoQuality.LOW
+        "medium" -> VideoQuality.MEDIUM
+        else -> VideoQuality.HIGH
+    }
+}
