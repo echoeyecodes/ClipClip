@@ -36,8 +36,10 @@ class VideoAdapter(private val callback: VideoAdapterCallback) :
         private val timestampTextView = layoutBinding.timestamp
 
         fun bind(model: VideoModel) {
-            Glide.with(view).load(model.getVideoUri()).sizeMultiplier(0.5f).override(size)
-                .into(imageView)
+            model.videoUri?.let {
+                Glide.with(view).load(it).sizeMultiplier(0.5f).override(size)
+                    .into(imageView)
+            }
             view.setOnClickListener { callback.onVideoSelected(model) }
             timestampTextView.text = model.duration.formatVideoTime()
         }

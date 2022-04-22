@@ -20,7 +20,7 @@ import java.io.File
 
 class VideoTrimManager(private val context: Context) {
     private val callbacks = ArrayList<VideoTrimCallback>()
-    var shouldTerminate = false
+    private var shouldTerminate = false
 
     fun addTrimCallback(callback: VideoTrimCallback) {
         this.callbacks.add(callback)
@@ -43,43 +43,32 @@ class VideoTrimManager(private val context: Context) {
     suspend fun startTrim(videoUri: String, configModel: VideoConfigModel) {
         resetTerminate()
         val count = configModel.getSplitCount()
-        val format = if (configModel.format == VideoFormat.MP3) {
-            " -q:a 0 -map a "
-        } else {
-            "-vcodec libx264"
-        }
         val uris = ArrayList<Uri>()
         for (i in 0 until count) {
             if (shouldTerminate) {
                 break
             }
             callbacks.forEach { it.onTrimStarted(i + 1, count) }
-            val start = (configModel.startTime.toSeconds() + (i * configModel.splitTime))
+            val start = (configModel.startTime + (i * configModel.splitTime))
 
-            val splitTime = if ((configModel.endTime.toSeconds() - start) < configModel.splitTime) {
-                configModel.endTime.toSeconds() - start
+            val splitTime = if ((configModel.endTime - start) < configModel.splitTime) {
+                configModel.endTime - start
             } else {
                 configModel.splitTime
             }
 
-            if (configModel.splitTime + start < configModel.endTime) {
-                val commandString = format
-                if (start >= configModel.endTime.toSeconds()) {
-                    break
-                }
-                createFile(
-                    context.getString(R.string.app_name).plus(i),
-                    configModel.format.extension
-                )?.let {
-                    uris.add(it)
-                    executeVideoEdit(
-                        videoUri.toUri(),
-                        it,
-                        commandString,
-                        "-ss ${start.formatTimeToDigits()}",
-                        "-t ${splitTime.formatTimeToDigits()}"
-                    )
-                }
+            createFile(
+                context.getString(R.string.app_name).plus(i),
+                configModel.format.extension
+            )?.let {
+                uris.add(it)
+                val ffmpegCommand = FFMPEGCommand.Builder().inputUri(context, videoUri.toUri())
+                    .outputUri(context, it)
+                    .format(configModel.format)
+                    .quality(configModel.quality)
+                    .trim(start, splitTime)
+                    .build()
+                executeVideoEdit(ffmpegCommand.command)
             }
         }
         callbacks.forEach { it.onTrimEnded(uris) }
@@ -132,22 +121,11 @@ class VideoTrimManager(private val context: Context) {
     }
 
     private suspend fun executeVideoEdit(
-        videoUri: Uri,
-        path: Uri,
-        commandString: String,
-        startTime: String,
-        splitTime: String
+        commandString: String
     ) {
-        val iUri = FFmpegKitConfig.getSafParameterForRead(context, videoUri)
-        val oUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            FFmpegKitConfig.getSafParameterForWrite(context, path)
-        } else {
-            path.toString()
-        }
-        AndroidUtilities.log(oUri.toString())
-
         try {
-            val session = FFmpegKit.execute(" $startTime -i $iUri $splitTime $commandString $oUri")
+            AndroidUtilities.log(commandString)
+            val session = FFmpegKit.execute(commandString)
             AndroidUtilities.log("FFMPEG process exited with state ${session.state} and return code ${session.returnCode}")
             val returnCode = session.returnCode
             if (ReturnCode.isSuccess(returnCode)) {

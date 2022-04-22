@@ -32,7 +32,7 @@ class VideoActivityViewModel(val uri: String, application: Application) :
     private val timestampDifferenceLiveData = MutableLiveData("00:00")
     var currentPosition = 0L
     var trimProgress = Pair(0, 0)
-    var splitTime = 1
+    var splitTime = 1L
 
     init {
         duration = getVideoDuration(Uri.parse(uri))
@@ -87,11 +87,11 @@ class VideoActivityViewModel(val uri: String, application: Application) :
     /*
         Get the total duration for the current video trim cut
      */
-    fun getTotalDurationByIndex(): Int {
+    fun getTotalDurationByIndex(): Long {
         val index = (trimProgress.first - 1)
-        val start = (startTime.toSeconds() + (index * splitTime))
-        return if ((endTime.toSeconds() - start) < splitTime) {
-            endTime.toSeconds() - start
+        val start = (startTime + (index * splitTime))
+        return if ((endTime - start) < splitTime) {
+            endTime - start
         } else {
             splitTime
         }

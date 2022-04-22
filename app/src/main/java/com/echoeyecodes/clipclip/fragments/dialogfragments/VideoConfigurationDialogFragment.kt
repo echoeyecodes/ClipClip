@@ -23,6 +23,7 @@ class VideoConfigurationDialogFragment : BaseDialogFragment(), SeekBar.OnSeekBar
     private lateinit var seekBarText: TextView
     private lateinit var chipGroup: ChipGroup
     private lateinit var seekbar: SeekBar
+    private lateinit var radioGroup: RadioGroup
     private val viewModel by lazy { ViewModelProvider(this)[VideoConfigurationViewModel::class.java] }
     private lateinit var binding: FragmentVideoConfigurationBinding
     private lateinit var doneBtn: MaterialButton
@@ -64,12 +65,14 @@ class VideoConfigurationDialogFragment : BaseDialogFragment(), SeekBar.OnSeekBar
         super.onViewCreated(view, savedInstanceState)
         doneBtn = binding.doneBtn
         seekbar = binding.seekBar
+        radioGroup = binding.qualityRadioGroup
         seekBarText = binding.seekBarText
         chipGroup = binding.formatChipGroup
 
         doneBtn.setOnClickListener {
             videoConfigurationCallback?.onFinish(
                 viewModel.splitTime,
+                viewModel.quality,
                 viewModel.format
             )
         }
@@ -83,8 +86,49 @@ class VideoConfigurationDialogFragment : BaseDialogFragment(), SeekBar.OnSeekBar
             }
         }
 
-        seekbar.progress = viewModel.splitTime
+        seekbar.progress = (viewModel.splitTime / 1000).toInt()
         chipGroup.check(getCheckedFormat())
+        radioGroup.check(getCheckedQuality())
+
+        radioGroup.setOnCheckedChangeListener { radioGroup, i ->
+            when (i) {
+                R.id.very_low -> {
+                    viewModel.quality = (VideoQuality.VERY_LOW)
+                }
+                R.id.low -> {
+                    viewModel.quality = (VideoQuality.LOW)
+                }
+                R.id.medium -> {
+                    viewModel.quality = (VideoQuality.MEDIUM)
+                }
+                R.id.high -> {
+                    viewModel.quality = (VideoQuality.HIGH)
+                }
+                else -> {
+                    viewModel.quality = (VideoQuality.NORMAL)
+                }
+            }
+        }
+    }
+
+    private fun getCheckedQuality(): Int {
+        return when (viewModel.quality) {
+            VideoQuality.VERY_LOW -> {
+                R.id.very_low
+            }
+            VideoQuality.LOW -> {
+                R.id.low
+            }
+            VideoQuality.MEDIUM -> {
+                R.id.medium
+            }
+            VideoQuality.HIGH -> {
+                R.id.high
+            }
+            else -> {
+                R.id.normal
+            }
+        }
     }
 
     private fun getCheckedFormat(): Int {
@@ -100,7 +144,7 @@ class VideoConfigurationDialogFragment : BaseDialogFragment(), SeekBar.OnSeekBar
 
     @SuppressLint("SetTextI18n")
     override fun onProgressChanged(p0: SeekBar, p1: Int, p2: Boolean) {
-        viewModel.splitTime = (p1)
+        viewModel.splitTime = (p1 * 1000L)
         seekBarText.text = "Video would be split to $p1 seconds for every chunk"
     }
 

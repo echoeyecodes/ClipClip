@@ -14,6 +14,7 @@ import com.echoeyecodes.clipclip.models.VideoConfigModel
 import com.echoeyecodes.clipclip.receivers.VideoTrimBroadcastReceiver
 import com.echoeyecodes.clipclip.trimmer.VideoTrimManager
 import com.echoeyecodes.clipclip.utils.VideoFormat
+import com.echoeyecodes.clipclip.utils.toVideoQuality
 import kotlinx.coroutines.*
 import java.lang.Exception
 
@@ -58,14 +59,15 @@ class VideoTrimWorkManager(context: Context, workerParams: WorkerParameters) :
                 val videoUri = inputData.getString("videoUri")!!
                 val startTime = inputData.getLong("startTime", 0L)
                 val endTime = inputData.getLong("endTime", 0L)
-                val splitTime = inputData.getInt("splitTime", 0)
+                val splitTime = inputData.getLong("splitTime", 0L)
                 val _format = inputData.getString("format")
+                val quality = (inputData.getString("quality") ?: "normal").toVideoQuality()
                 val format = if (_format == ".mp3") {
                     VideoFormat.MP3
                 } else VideoFormat.MP4
                 videoTrimManager.startTrim(
                     videoUri,
-                    VideoConfigModel(startTime, endTime, splitTime, format)
+                    VideoConfigModel(startTime, endTime, splitTime, format, quality)
                 )
                 Result.success()
             } catch (exception: Exception) {

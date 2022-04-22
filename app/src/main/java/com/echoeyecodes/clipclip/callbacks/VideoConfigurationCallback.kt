@@ -4,5 +4,5 @@ import com.echoeyecodes.clipclip.utils.VideoFormat
 import com.echoeyecodes.clipclip.utils.VideoQuality
 
 interface VideoConfigurationCallback {
-    fun onFinish(splitTime: Int, format:VideoFormat)
+    fun onFinish(splitTime: Long, quality: VideoQuality, format:VideoFormat)
 }
