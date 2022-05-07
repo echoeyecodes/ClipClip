@@ -30,7 +30,6 @@ class VideoTrimManager(private val context: Context) {
         private var instance: VideoTrimManager? = null
         fun getInstance(context: Context) = instance ?: synchronized(this) {
             val newInstance = VideoTrimManager(context)
-            AndroidUtilities.log((instance == null).toString())
             instance = newInstance
             return newInstance
         }

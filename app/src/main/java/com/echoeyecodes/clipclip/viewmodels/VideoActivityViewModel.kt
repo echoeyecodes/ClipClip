@@ -3,14 +3,46 @@ package com.echoeyecodes.clipclip.viewmodels
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import androidx.lifecycle.*
+import com.echoeyecodes.clipclip.FileUtils
 import com.echoeyecodes.clipclip.utils.AndroidUtilities
+import com.echoeyecodes.clipclip.utils.getScreenSize
 import com.echoeyecodes.clipclip.utils.toSeconds
 import com.echoeyecodes.clipclip.utils.withPrefix
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.opencv.android.OpenCVLoader
+import org.opencv.android.Utils
+import org.opencv.core.Mat
+import org.opencv.core.Size
+import org.opencv.imgproc.Imgproc
+import org.opencv.videoio.VideoCapture
+//import org.bytedeco.javacv.AndroidFrameConverter
+//import org.bytedeco.javacv.FFmpegFrameGrabber
+//import org.bytedeco.javacv.Frame
+//import org.bytedeco.javacv.OpenCVFrameConverter
+//import org.bytedeco.opencv.global.opencv_videoio.*
+//import org.bytedeco.opencv.opencv_core.GpuMat
+//import org.bytedeco.opencv.opencv_core.Mat
+//import org.bytedeco.opencv.opencv_core.UMat
+//import org.bytedeco.opencv.opencv_videoio.VideoCapture
+import org.opencv.videoio.Videoio
+import org.opencv.videoio.Videoio.CAP_PROP_FPS
+import org.opencv.videoio.Videoio.CAP_PROP_FRAME_COUNT
+//import org.bytedeco.javacv.AndroidFrameConverter
+//import org.bytedeco.javacv.FFmpegFrameGrabber
+//import org.bytedeco.javacv.OpenCVFrameConverter
+//import org.bytedeco.opencv.opencv_core.Mat
+//import org.bytedeco.opencv.opencv_videoio.VideoCapture
+//import org.bytedeco.opencv.opencv_videostab.VideoFileSource
 import kotlin.math.max
+import kotlin.math.min
 
 class VideoActivityViewModelFactory(private val uri: String, private val context: Context) :
     ViewModelProvider.Factory {
@@ -33,11 +65,63 @@ class VideoActivityViewModel(val uri: String, application: Application) :
     var currentPosition = 0L
     var trimProgress = Pair(0, 0)
     var splitTime = 1L
+    val image = MutableLiveData<Bitmap?>()
+    val file = FileUtils.getFileFromUri(getApplication(), Uri.parse(uri))
+//    private val frameGrabber = FFmpegFrameGrabber(file).apply {
+//        start()
+//    }
 
     init {
         duration = getVideoDuration(Uri.parse(uri))
         endTime = duration
         setVideoTimestamps(0f, 1f)
+        if (OpenCVLoader.initDebug()) {
+            getVideoFrames()
+        }
+    }
+
+    private fun getVideoFrames() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val source = VideoCapture(file.absolutePath)
+            val mat = Mat()
+            var count = 0
+            while (source.read(mat)) {
+
+                // tiktok dimension 9:16
+                // remember that cols represent width and rows represent height
+                val dimension = Pair(9.0, 16.0)
+                val minimumSize = min(mat.cols(), mat.rows())
+
+                val newDimension = if (dimension.first > dimension.second) {
+                    val value = (dimension.second / dimension.first) * minimumSize
+                    Pair(minimumSize, value)
+                } else {
+                    val value = (dimension.first / dimension.second) * minimumSize
+                    Pair(value, minimumSize)
+                }
+                val height = newDimension.second.toInt()
+                val width = newDimension.first.toInt()
+
+                val submat = mat.submat(0, height, 0, width)
+
+//                val newHeight = 360.0
+//                val percentageDifference = (newHeight - mat.height()) / mat.height()
+//                val newWidth = mat.width() + (percentageDifference * mat.width())
+//
+//                Imgproc.resize(mat, mat, Size(newWidth, newHeight))
+                Imgproc.blur(mat, mat, Size(16.0, 16.0))
+
+                val bitmap =
+                    Bitmap.createBitmap(submat.width(), submat.height(), Bitmap.Config.ARGB_8888)
+                Utils.matToBitmap(submat, bitmap)
+                withContext(Dispatchers.Main) {
+                    image.value = (bitmap)
+                    count++
+                }
+            }
+            AndroidUtilities.log("done")
+            AndroidUtilities.log(count)
+        }
     }
 
     /*

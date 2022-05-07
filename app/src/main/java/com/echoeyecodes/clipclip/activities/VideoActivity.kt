@@ -1,6 +1,7 @@
 package com.echoeyecodes.clipclip.activities
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -13,6 +14,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.work.*
 import com.arthenica.ffmpegkit.FFmpegKitConfig
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.echoeyecodes.clipclip.callbacks.VideoConfigurationCallback
 import com.echoeyecodes.clipclip.callbacks.VideoTimestampCallback
 import com.echoeyecodes.clipclip.callbacks.VideoTrimCallback
@@ -34,7 +38,6 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.button.MaterialButton
-import kotlin.math.max
 import kotlin.math.min
 
 class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listener,
@@ -79,6 +82,17 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         val videoUri = getVideoUri() ?: return finish()
         val viewModelFactory = VideoActivityViewModelFactory(videoUri, this)
         viewModel = ViewModelProvider(this, viewModelFactory)[VideoActivityViewModel::class.java]
+
+//        val file = FileUtils.getFileFromUri(this, Uri.parse(videoUri))
+//        val frameGrabber = FFmpegFrameGrabber(file)
+//        frameGrabber.start()
+//        AndroidUtilities.log(frameGrabber.videoFrameRate)
+
+//        val videoCapture = VideoCapture()
+//        videoCapture.open(file.absolutePath)
+//        val mat = Mat()
+//        videoCapture.read(mat)
+//        AndroidUtilities.log("${mat.rows()}*${mat.cols()}")
 
         videoConfigurationDialogFragment =
             (supportFragmentManager.findFragmentByTag(VideoConfigurationDialogFragment.TAG) as VideoConfigurationDialogFragment?)
@@ -126,6 +140,15 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         doneBtn.setOnClickListener { showConfigurationDialog() }
         closeBtn.setOnClickListener { onBackPressed() }
         timeBtn.setOnClickListener { openTimestampFragment() }
+
+        viewModel.image.observe(this){
+            if(it != null){
+//                Glide.with(this).load(it).into(imageTarget)
+                binding.playerBackground.updateBitmap(it)
+            }
+//            Glide.with(this).load(it).into(testImage)
+        }
+//        Glide.with(this).load(viewModel.getVideoFrames()).into(testImage)
     }
 
     private fun initFFMPEGListener() {

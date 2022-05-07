@@ -5,87 +5,98 @@
     android:layout_height="match_parent"
     android:background="@color/black">
 
-    <include android:id="@+id/toolbar" layout="@layout/video_selection_toolbar" />
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/video_selection_toolbar" />
 
     <FrameLayout
         android:id="@+id/player_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar"
         android:layout_above="@id/options"
+        android:layout_below="@+id/toolbar"
         android:background="@color/neo_black">
 
-    <com.google.android.exoplayer2.ui.PlayerView
-        android:id="@+id/player_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/neo_black"
-        app:use_controller="false" />
+        <com.echoeyecodes.clipclip.customviews.videoview.VideoFrameView
+            android:id="@+id/player_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@color/neo_black">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/player_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:use_controller="false" />
+        </com.echoeyecodes.clipclip.customviews.videoview.VideoFrameView>
 
-        <TextView
-            android:id="@+id/timestamp"
-            style="@style/Regular"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/drawable_text_overlay"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center"
-            android:text="00:00 - 08:00"
-            android:textColor="@color/white"
-            android:textSize="14sp" />
+            android:orientation="vertical">
 
-        <com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionView
-            android:id="@+id/video_selection"
-            android:layout_width="match_parent"
-            android:layout_height="70dp"
-            android:layout_marginBottom="4dp"
-            android:background="@android:color/transparent" />
+            <TextView
+                android:id="@+id/timestamp"
+                style="@style/Regular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/drawable_text_overlay"
+                android:gravity="center"
+                android:text="00:00 - 08:00"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+            <com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionView
+                android:id="@+id/video_selection"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:layout_marginBottom="4dp"
+                android:background="@android:color/transparent" />
+
+            <TextView
+                android:id="@+id/total_duration"
+                style="@style/Regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:background="@drawable/drawable_text_overlay"
+                android:paddingHorizontal="5dp"
+                android:text="00:00"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/total_duration"
-            style="@style/Regular"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="30dp"
-            android:background="@drawable/drawable_text_overlay"
-            android:paddingHorizontal="5dp"
-            android:text="00:00"
-            android:textColor="@color/white"
-            android:textSize="14sp" />
-
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/text"
-        style="@style/SemiBold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textColor="@color/white"
-        android:visibility="gone" />
-
-    <RelativeLayout
-        android:id="@+id/buffer_progress_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/overlay"
-        android:clickable="true"
-        android:focusable="true"
-        android:visibility="gone"
-        android:elevation="199dp">
-
-        <ProgressBar
+            android:id="@+id/text"
+            style="@style/SemiBold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:indeterminate="true" />
-    </RelativeLayout>
-</FrameLayout>
+            android:textColor="@color/white"
+            android:visibility="gone" />
 
-    <include android:id="@+id/options" layout="@layout/video_selection_options" />
+        <RelativeLayout
+            android:id="@+id/buffer_progress_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/overlay"
+            android:clickable="true"
+            android:elevation="199dp"
+            android:focusable="true"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:indeterminate="true" />
+        </RelativeLayout>
+    </FrameLayout>
+
+    <include
+        android:id="@+id/options"
+        layout="@layout/video_selection_options" />
 </RelativeLayout>

@@ -8,3 +8,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "ClipClip"
 include ':app'
+include ':openCV'
+include ':openCV'

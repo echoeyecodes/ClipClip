@@ -13,6 +13,19 @@ android {
         viewBinding true
     }
 
+    packagingOptions {
+        exclude 'META-INF/native-image/android-arm/jnijavacpp/jni-config.json'
+        exclude 'META-INF/native-image/android-arm/jnijavacpp/reflect-config.json'
+        exclude 'META-INF/native-image/android-arm64/jnijavacpp/jni-config.json'
+        exclude 'META-INF/native-image/android-arm64/jnijavacpp/reflect-config.json'
+        exclude 'META-INF/native-image/android-x86_64/jnijavacpp/jni-config.json'
+        exclude 'META-INF/native-image/android-x86/jnijavacpp/jni-config.json'
+        exclude 'META-INF/native-image/android-x86_64/jnijavacpp/reflect-config.json'
+        exclude 'META-INF/native-image/android-x86/jnijavacpp/reflect-config.json'
+
+        pickFirst '**/*.so'
+    }
+
     defaultConfig {
         applicationId "com.echoeyecodes.clipclip"
         minSdk 21
@@ -41,9 +54,14 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':openCV')
     def exo_version = "2.16.1"
     def lifecycle_version = "2.4.0"
     def work_version = "2.7.1"
+    def openblas = '0.3.19'
+    def javacv = "1.5.7"
+    def opencv = "4.5.5"
+    def ffmpeg = "5.0"
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
@@ -89,4 +107,41 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:29.3.1')
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
+
+//    implementation group: 'org.bytedeco', name: 'javacv', version: '1.5.7'
+//    implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.19-1.5.7', classifier: 'android-arm'
+//    implementation group: 'org.bytedeco', name: 'opencv', version: '4.5.5-1.5.7', classifier: 'android-arm'
+//    implementation group: 'org.bytedeco', name: 'ffmpeg', version: '5.0-1.5.7', classifier: 'android-arm'
+
+//    api "org.bytedeco:openblas:${openblas}-${javacv}"
+//    api "org.bytedeco:openblas:${openblas}-${javacv}:android-arm"
+//    api "org.bytedeco:openblas:${openblas}-${javacv}:android-arm64"
+//    api "org.bytedeco:opencv:${opencv}-${javacv}"
+//    api "org.bytedeco:opencv:${opencv}-${javacv}:android-arm"
+//    api "org.bytedeco:opencv:${opencv}-${javacv}:android-arm64"
+//
+//    api "org.bytedeco:ffmpeg:${ffmpeg}-${javacv}"
+//    api "org.bytedeco:ffmpeg:${ffmpeg}-${javacv}:android-arm"
+//    api "org.bytedeco:ffmpeg:${ffmpeg}-${javacv}:android-arm64"
+
+//    implementation group: 'org.bytedeco', name: 'javacv', version: '1.5.7'
+//    implementation "org.bytedeco:opencv:${opencv}-${javacv}:android-arm"
+//    implementation "org.bytedeco:opencv:${opencv}-${javacv}:android-arm64"
+//    implementation "org.bytedeco:opencv:${opencv}-${javacv}:android-x86"
+//    implementation "org.bytedeco:opencv:${opencv}-${javacv}:android-x86_64"
+////
+//    implementation "org.bytedeco:openblas:${openblas}-${javacv}:android-arm64"
+//    implementation "org.bytedeco:openblas:${openblas}-${javacv}:android-arm"
+//    implementation "org.bytedeco:openblas:${openblas}-${javacv}:android-x86"
+//    implementation "org.bytedeco:openblas:${openblas}-${javacv}:android-x86_64"
+////
+//    implementation "org.bytedeco:ffmpeg:${ffmpeg}-${javacv}:android-arm64"
+//    implementation "org.bytedeco:ffmpeg:${ffmpeg}-${javacv}:android-arm"
+//    implementation "org.bytedeco:ffmpeg:${ffmpeg}-${javacv}:android-x86"
+//    implementation "org.bytedeco:ffmpeg:${ffmpeg}-${javacv}:android-x86_64"
+
+//    implementation group: 'org.bytedeco.javacpp-presets', name: 'ffmpeg', version: '4.1-1.4.4', classifier: 'android-arm'
+//    implementation group: 'org.bytedeco.javacpp-presets', name: 'ffmpeg', version: '4.1-1.4.4', classifier: 'android-x86'
+//    implementation group: 'org.bytedeco.javacpp-presets', name: 'ffmpeg', version: '4.1-1.4.4', classifier: 'android-arm64'
+//    implementation group: 'org.bytedeco.javacpp-presets', name: 'ffmpeg', version: '4.1-1.4.4', classifier: 'android-x86_64'
 }
