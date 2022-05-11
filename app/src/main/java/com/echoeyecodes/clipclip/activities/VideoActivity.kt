@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Parcelable
-import android.view.TextureView
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -14,15 +13,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.work.*
 import com.arthenica.ffmpegkit.FFmpegKitConfig
-import com.echoeyecodes.clipclip.callbacks.VideoConfigurationCallback
-import com.echoeyecodes.clipclip.callbacks.VideoTimestampCallback
-import com.echoeyecodes.clipclip.callbacks.VideoTrimCallback
+import com.echoeyecodes.clipclip.R
+import com.echoeyecodes.clipclip.callbacks.*
 import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionCallback
 import com.echoeyecodes.clipclip.customviews.videoselectionview.VideoSelectionView
 import com.echoeyecodes.clipclip.databinding.ActivityVideoSelectionBinding
 import com.echoeyecodes.clipclip.fragments.dialogfragments.ProgressDialogFragment
 import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoConfigurationDialogFragment
 import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoTimestampDialogFragment
+import com.echoeyecodes.clipclip.fragments.videofragments.VideoCanvasFragment
 import com.echoeyecodes.clipclip.trimmer.VideoTrimManager
 import com.echoeyecodes.clipclip.utils.*
 import com.echoeyecodes.clipclip.viewmodels.VideoActivityViewModel
@@ -38,7 +37,7 @@ import com.google.android.material.button.MaterialButton
 import kotlin.math.min
 
 class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listener,
-    VideoConfigurationCallback, VideoTrimCallback, VideoTimestampCallback {
+    VideoConfigurationCallback, VideoTrimCallback, VideoTimestampCallback, VideoActivityCallback {
     private lateinit var videoTrimManager: VideoTrimManager
     private val binding by lazy { ActivityVideoSelectionBinding.inflate(layoutInflater) }
     private lateinit var textView: TextView
@@ -47,6 +46,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     private lateinit var durationTextView: TextView
     private lateinit var doneBtn: MaterialButton
     private lateinit var timeBtn: View
+    private lateinit var canvasBtn: View
     private lateinit var closeBtn: View
     private lateinit var videoSelectionView: VideoSelectionView
     private var player: ExoPlayer? = null
@@ -56,6 +56,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     private lateinit var videoConfigurationDialogFragment: VideoConfigurationDialogFragment
     private lateinit var videoTimestampDialogFragment: VideoTimestampDialogFragment
     private val handler by lazy { Handler(mainLooper) }
+    private val videoActivityCallbacks = ArrayList<VideoPlayerCallback>()
 
     private val playerRunnable = object : Runnable {
         override fun run() {
@@ -71,6 +72,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         timestamp = binding.timestamp
         playerView = binding.playerView
         closeBtn = binding.toolbar.closeBtn
+        canvasBtn = binding.options.canvasBtn
         timeBtn = binding.options.timeBtn
         doneBtn = binding.toolbar.doneBtn
         bufferProgressContainer = binding.bufferProgressContainer
@@ -126,12 +128,24 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         doneBtn.setOnClickListener { showConfigurationDialog() }
         closeBtn.setOnClickListener { onBackPressed() }
         timeBtn.setOnClickListener { openTimestampFragment() }
+        canvasBtn.setOnClickListener { showVideoCanvasFragment() }
+    }
 
-        viewModel.image.observe(this) {
-            if (it != null) {
-                binding.playerBackground.updateBitmap(it)
-            }
-        }
+    private fun getVideoCanvasFragment(videoActivityCallback: VideoActivityCallback): VideoCanvasFragment {
+        val fragment =
+            supportFragmentManager.findFragmentByTag(VideoCanvasFragment.TAG) as VideoCanvasFragment?
+                ?: VideoCanvasFragment().apply {
+                    this.videoActivityCallback = videoActivityCallback
+                }
+        return fragment
+    }
+
+    private fun showVideoCanvasFragment() {
+        val fragment = getVideoCanvasFragment(this)
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragment_container_view, fragment, VideoCanvasFragment.TAG)
+        transaction.addToBackStack(VideoCanvasFragment.TAG)
+        transaction.commitAllowingStateLoss()
     }
 
     private fun initFFMPEGListener() {
@@ -256,7 +270,6 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         when (playbackState) {
             ExoPlayer.STATE_READY -> {
                 updateVideoProgressMarker(player?.currentPosition ?: 0)
-                updateBackgroundFrame()
             }
 
         }
@@ -279,13 +292,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
                 viewModel.currentPosition = viewModel.getStartTime()
                 it.pause()
             }
-            updateBackgroundFrame()
-        }
-    }
-
-    private fun updateBackgroundFrame() {
-        (playerView.videoSurfaceView as TextureView?)?.bitmap?.let {
-            viewModel.blurFrame(it)
+            videoActivityCallbacks.forEach { it.onPlayerProgress(position) }
         }
     }
 
@@ -346,4 +353,22 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         val _end = min(1.0f, end.toFloat() / duration)
         videoSelectionView.updateMarkers(_start, _end)
     }
+
+    override fun registerVideoActivityCallback(videoPlayerCallback: VideoPlayerCallback) {
+        videoActivityCallbacks.add(videoPlayerCallback)
+    }
+
+    override fun removeVideoActivityCallback(videoPlayerCallback: VideoPlayerCallback) {
+        videoActivityCallbacks.remove(videoPlayerCallback)
+    }
+
+    override fun getPlayer(): Player? {
+        return player
+    }
+
+    override fun restorePlayerView() {
+        playerView.player = null
+        playerView.player = getPlayer()
+    }
+
 }

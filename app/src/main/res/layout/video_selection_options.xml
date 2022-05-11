@@ -11,11 +11,22 @@
     android:layout_height="?attr/actionBarSize">
 
     <ImageButton
+        android:id="@+id/canvas_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_baseline_aspect_ratio_24"
+        android:padding="10dp"
+        android:layout_marginHorizontal="5dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:tint="@color/white" />
+
+    <ImageButton
         android:id="@+id/time_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_baseline_av_timer_24"
         android:padding="10dp"
+        android:layout_marginHorizontal="5dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         app:tint="@color/white" />
 
