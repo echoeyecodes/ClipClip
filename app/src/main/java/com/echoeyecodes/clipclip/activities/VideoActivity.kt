@@ -362,6 +362,14 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         videoActivityCallbacks.remove(videoPlayerCallback)
     }
 
+    override fun closeFragment() {
+        val fragment = getVideoCanvasFragment(this)
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.remove(fragment)
+        transaction.commitAllowingStateLoss()
+        supportFragmentManager.popBackStack()
+    }
+
     override fun getPlayer(): Player? {
         return player
     }

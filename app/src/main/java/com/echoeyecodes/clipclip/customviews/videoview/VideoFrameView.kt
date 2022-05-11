@@ -1,10 +1,7 @@
 package com.echoeyecodes.clipclip.customviews.videoview
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
@@ -21,11 +18,29 @@ class VideoFrameView(context: Context, attributeSet: AttributeSet) :
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        bitmap?.let {
-            val startX = (_width - it.width) / 2f
-            val startY = (_height - it.height) / 2f
-            canvas.drawBitmap(it, startX, startY, paint)
+        if (bitmap == null) {
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+        } else {
+            bitmap?.let {
+                val startX = (_width - it.width) / 2f
+                val startY = (_height - it.height) / 2f
+                canvas.drawBitmap(it, startX, startY, paint)
+            }
         }
+    }
+
+    private fun getParentView(): View {
+        return parent as View
+    }
+
+    fun resetBitmap() {
+        this.bitmap = null
+        val newLayoutParams = layoutParams as LayoutParams
+        val parentView = getParentView()
+        newLayoutParams.width = parentView.width
+        newLayoutParams.height = parentView.height
+        layoutParams = newLayoutParams
+        invalidate()
     }
 
     fun updateBitmap(bitmap: Bitmap) {
@@ -35,15 +50,16 @@ class VideoFrameView(context: Context, attributeSet: AttributeSet) :
             val bitmapHeight = bitmap.height
 
             val ratioBitmap = bitmapWidth / bitmapHeight.toFloat()
-            val ratioMax = (parent as View).width / (parent as View).height.toFloat()
+            val parentView = getParentView()
+            val ratioMax = parentView.width / parentView.height.toFloat()
 
-            var finalWidth = width
-            var finalHeight = height
+            var finalWidth = parentView.width
+            var finalHeight = parentView.height
 
             if (ratioMax > ratioBitmap) {
-                finalWidth = (height * ratioBitmap).toInt()
+                finalWidth = (finalHeight * ratioBitmap).toInt()
             } else {
-                finalHeight = (width / ratioBitmap).toInt()
+                finalHeight = (finalWidth / ratioBitmap).toInt()
             }
 
             this.bitmap = createScaledBitmap(bitmap, finalWidth, finalHeight)

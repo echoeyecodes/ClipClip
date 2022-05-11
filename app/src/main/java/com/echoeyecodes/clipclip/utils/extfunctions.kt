@@ -99,3 +99,14 @@ fun String.toVideoQuality(): VideoQuality {
         else -> VideoQuality.NORMAL
     }
 }
+
+fun Pair<Double, Double>.getDimensions(size: Double): Pair<Double, Double> {
+    val newDimension = if (this.first > this.second) {
+        val value = (this.second / this.first) * size
+        Pair(size, value)
+    } else {
+        val value = (this.first / this.second) * size
+        Pair(value, size)
+    }
+    return newDimension
+}

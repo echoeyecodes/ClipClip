@@ -7,4 +7,5 @@ interface VideoActivityCallback {
     fun restorePlayerView()
     fun registerVideoActivityCallback(videoPlayerCallback: VideoPlayerCallback)
     fun removeVideoActivityCallback(videoPlayerCallback: VideoPlayerCallback)
+    fun closeFragment()
 }

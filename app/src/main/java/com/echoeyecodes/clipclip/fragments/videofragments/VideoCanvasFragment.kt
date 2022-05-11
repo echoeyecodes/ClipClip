@@ -7,19 +7,28 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.echoeyecodes.clipclip.R
+import com.echoeyecodes.clipclip.adapters.VideoCanvasAdapter
 import com.echoeyecodes.clipclip.callbacks.VideoActivityCallback
+import com.echoeyecodes.clipclip.callbacks.VideoCanvasAdapterCallback
 import com.echoeyecodes.clipclip.callbacks.VideoPlayerCallback
 import com.echoeyecodes.clipclip.customviews.videoview.VideoFrameView
 import com.echoeyecodes.clipclip.databinding.FragmentVideoCanvasBinding
+import com.echoeyecodes.clipclip.models.VideoCanvasModel
 import com.echoeyecodes.clipclip.utils.AndroidUtilities
+import com.echoeyecodes.clipclip.utils.CustomItemDecoration
 import com.echoeyecodes.clipclip.viewmodels.VideoCanvasViewModel
 import com.google.android.exoplayer2.ui.PlayerView
 
-class VideoCanvasFragment : Fragment(), VideoPlayerCallback {
+class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterCallback {
     private lateinit var playerView: PlayerView
     private lateinit var playerBackground: VideoFrameView
     private lateinit var binding: FragmentVideoCanvasBinding
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var closeBtn: View
+    private lateinit var doneBtn: View
     private val viewModel by lazy { ViewModelProvider(this)[VideoCanvasViewModel::class.java] }
     var videoActivityCallback: VideoActivityCallback? = null
 
@@ -35,12 +44,29 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback {
         val view = inflater.inflate(R.layout.fragment_video_canvas, container, false)
         binding = FragmentVideoCanvasBinding.bind(view)
         playerView = binding.playerView
+        recyclerView = binding.recyclerView
         playerBackground = binding.playerBackground
+        closeBtn = binding.toolbar.closeBtn
+        doneBtn = binding.toolbar.doneBtn
+
+        closeBtn.setOnClickListener { videoActivityCallback?.closeFragment() }
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+        val adapter = VideoCanvasAdapter(this)
+        recyclerView.layoutManager = layoutManager
+        val itemDecoration = CustomItemDecoration(10, 5)
+        recyclerView.addItemDecoration(itemDecoration)
+        recyclerView.adapter = adapter
+
+        viewModel.videoDimensions.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
+
         playerView.player = videoActivityCallback?.getPlayer()
         playerView.setAspectRatioListener { _, _, _ ->
             updateBackgroundFrame()
@@ -49,7 +75,7 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback {
         viewModel.image.observe(viewLifecycleOwner) {
             if (it != null) {
                 playerBackground.updateBitmap(it)
-            }
+            } else playerBackground.resetBitmap()
         }
     }
 
@@ -82,5 +108,9 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback {
         (playerView.videoSurfaceView as TextureView?)?.bitmap?.let {
             viewModel.blurFrame(it)
         }
+    }
+
+    override fun onCanvasItemSelected(model: VideoCanvasModel) {
+        viewModel.setSelectedDimension(model)
     }
 }
