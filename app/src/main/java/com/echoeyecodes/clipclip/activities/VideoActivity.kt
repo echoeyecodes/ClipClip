@@ -1,11 +1,11 @@
 package com.echoeyecodes.clipclip.activities
 
 import android.content.Intent
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Parcelable
+import android.view.TextureView
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -14,9 +14,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.work.*
 import com.arthenica.ffmpegkit.FFmpegKitConfig
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.echoeyecodes.clipclip.callbacks.VideoConfigurationCallback
 import com.echoeyecodes.clipclip.callbacks.VideoTimestampCallback
 import com.echoeyecodes.clipclip.callbacks.VideoTrimCallback
@@ -83,17 +80,6 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         val viewModelFactory = VideoActivityViewModelFactory(videoUri, this)
         viewModel = ViewModelProvider(this, viewModelFactory)[VideoActivityViewModel::class.java]
 
-//        val file = FileUtils.getFileFromUri(this, Uri.parse(videoUri))
-//        val frameGrabber = FFmpegFrameGrabber(file)
-//        frameGrabber.start()
-//        AndroidUtilities.log(frameGrabber.videoFrameRate)
-
-//        val videoCapture = VideoCapture()
-//        videoCapture.open(file.absolutePath)
-//        val mat = Mat()
-//        videoCapture.read(mat)
-//        AndroidUtilities.log("${mat.rows()}*${mat.cols()}")
-
         videoConfigurationDialogFragment =
             (supportFragmentManager.findFragmentByTag(VideoConfigurationDialogFragment.TAG) as VideoConfigurationDialogFragment?)
                 ?: VideoConfigurationDialogFragment.newInstance().apply {
@@ -141,14 +127,11 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         closeBtn.setOnClickListener { onBackPressed() }
         timeBtn.setOnClickListener { openTimestampFragment() }
 
-        viewModel.image.observe(this){
-            if(it != null){
-//                Glide.with(this).load(it).into(imageTarget)
+        viewModel.image.observe(this) {
+            if (it != null) {
                 binding.playerBackground.updateBitmap(it)
             }
-//            Glide.with(this).load(it).into(testImage)
         }
-//        Glide.with(this).load(viewModel.getVideoFrames()).into(testImage)
     }
 
     private fun initFFMPEGListener() {
@@ -196,6 +179,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             playerView.player = it
             val mediaItem = MediaItem.fromUri(viewModel.uri)
             it.setMediaItem(mediaItem)
+//            it.setVideoTextureView(textureView)
             it.seekTo(viewModel.currentPosition)
             it.playWhenReady = viewModel.isPlaying
             it.prepare()
@@ -235,6 +219,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
 
     private fun releasePlayer() {
         player?.run {
+//            this.clearVideoTextureView(textureView)
             viewModel.isPlaying = this.isPlaying
             viewModel.currentPosition = this.currentPosition
             this.removeListener(this@VideoActivity)
@@ -271,8 +256,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         when (playbackState) {
             ExoPlayer.STATE_READY -> {
                 updateVideoProgressMarker(player?.currentPosition ?: 0)
-//                val duration = player?.duration ?: 0
-//                viewModel.duration = duration
+                updateBackgroundFrame()
             }
 
         }
@@ -295,6 +279,13 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
                 viewModel.currentPosition = viewModel.getStartTime()
                 it.pause()
             }
+            updateBackgroundFrame()
+        }
+    }
+
+    private fun updateBackgroundFrame() {
+        (playerView.videoSurfaceView as TextureView?)?.bitmap?.let {
+            viewModel.blurFrame(it)
         }
     }
 

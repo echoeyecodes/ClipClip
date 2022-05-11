@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
@@ -66,61 +67,47 @@ class VideoActivityViewModel(val uri: String, application: Application) :
     var trimProgress = Pair(0, 0)
     var splitTime = 1L
     val image = MutableLiveData<Bitmap?>()
-    val file = FileUtils.getFileFromUri(getApplication(), Uri.parse(uri))
-//    private val frameGrabber = FFmpegFrameGrabber(file).apply {
-//        start()
-//    }
 
     init {
+        OpenCVLoader.initDebug()
         duration = getVideoDuration(Uri.parse(uri))
         endTime = duration
         setVideoTimestamps(0f, 1f)
-        if (OpenCVLoader.initDebug()) {
-            getVideoFrames()
-        }
     }
 
-    private fun getVideoFrames() {
+    fun blurFrame(bitmap: Bitmap) {
         viewModelScope.launch(Dispatchers.IO) {
-            val source = VideoCapture(file.absolutePath)
             val mat = Mat()
-            var count = 0
-            while (source.read(mat)) {
+            Utils.bitmapToMat(bitmap, mat)
+            val dimension = Pair(1.0, 1.0)
+            val minimumSize = min(mat.cols(), mat.rows())
 
-                // tiktok dimension 9:16
-                // remember that cols represent width and rows represent height
-                val dimension = Pair(9.0, 16.0)
-                val minimumSize = min(mat.cols(), mat.rows())
-
-                val newDimension = if (dimension.first > dimension.second) {
-                    val value = (dimension.second / dimension.first) * minimumSize
-                    Pair(minimumSize, value)
-                } else {
-                    val value = (dimension.first / dimension.second) * minimumSize
-                    Pair(value, minimumSize)
-                }
-                val height = newDimension.second.toInt()
-                val width = newDimension.first.toInt()
-
-                val submat = mat.submat(0, height, 0, width)
-
-//                val newHeight = 360.0
-//                val percentageDifference = (newHeight - mat.height()) / mat.height()
-//                val newWidth = mat.width() + (percentageDifference * mat.width())
-//
-//                Imgproc.resize(mat, mat, Size(newWidth, newHeight))
-                Imgproc.blur(mat, mat, Size(16.0, 16.0))
-
-                val bitmap =
-                    Bitmap.createBitmap(submat.width(), submat.height(), Bitmap.Config.ARGB_8888)
-                Utils.matToBitmap(submat, bitmap)
-                withContext(Dispatchers.Main) {
-                    image.value = (bitmap)
-                    count++
-                }
+            val newDimension = if (dimension.first > dimension.second) {
+                val value = (dimension.second / dimension.first) * minimumSize
+                Pair(minimumSize, value)
+            } else {
+                val value = (dimension.first / dimension.second) * minimumSize
+                Pair(value, minimumSize)
             }
-            AndroidUtilities.log("done")
-            AndroidUtilities.log(count)
+            val height = newDimension.second.toInt()
+            val width = newDimension.first.toInt()
+
+            val rowMid = mat.rows() / 2
+            val colMid = mat.cols() / 2
+
+            val rowStart = rowMid - (height / 2)
+            val rowEnd = rowMid + (height / 2)
+            val colStart = colMid - (width / 2)
+            val colEnd = colMid + (width / 2)
+            val submat = mat.submat(rowStart, rowEnd, colStart, colEnd)
+            Imgproc.blur(mat, mat, Size(16.0, 16.0))
+
+            val newBitmap =
+                Bitmap.createBitmap(submat.width(), submat.height(), Bitmap.Config.ARGB_8888)
+            Utils.matToBitmap(submat, newBitmap)
+            withContext(Dispatchers.Main) {
+                image.value = (newBitmap)
+            }
         }
     }
 

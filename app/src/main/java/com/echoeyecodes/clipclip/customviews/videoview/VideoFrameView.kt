@@ -6,6 +6,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.util.AttributeSet
+import android.view.View
 import android.widget.FrameLayout
 import com.echoeyecodes.clipclip.utils.AndroidUtilities
 
@@ -21,8 +22,6 @@ class VideoFrameView(context: Context, attributeSet: AttributeSet) :
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         bitmap?.let {
-//            canvas.drawBitmap(it, 0f, (_height.toFloat() - it.height) / 2, Paint())
-//            canvas.drawBitmap(it, srcRect, destRect,null)
             val startX = (_width - it.width) / 2f
             val startY = (_height - it.height) / 2f
             canvas.drawBitmap(it, startX, startY, paint)
@@ -36,7 +35,7 @@ class VideoFrameView(context: Context, attributeSet: AttributeSet) :
             val bitmapHeight = bitmap.height
 
             val ratioBitmap = bitmapWidth / bitmapHeight.toFloat()
-            val ratioMax = width / height.toFloat()
+            val ratioMax = (parent as View).width / (parent as View).height.toFloat()
 
             var finalWidth = width
             var finalHeight = height
