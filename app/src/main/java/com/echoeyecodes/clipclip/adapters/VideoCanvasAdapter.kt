@@ -22,7 +22,7 @@ class VideoCanvasAdapter(private val callback: VideoCanvasAdapterCallback) :
         const val SELECTED_LAYOUT = 1
     }
 
-    private val size = 80.convertToDp().toDouble()
+    private val size = 80.convertToDp().toFloat()
 
     override fun getItemViewType(position: Int): Int {
         val model = getItem(position)
@@ -51,7 +51,7 @@ class VideoCanvasAdapter(private val callback: VideoCanvasAdapterCallback) :
 
         @SuppressLint("SetTextI18n")
         fun bind(model: VideoCanvasModel) {
-            if (model.width == 0.0 && model.height == 0.0) {
+            if (model.width == 0.0f && model.height == 0.0f) {
                 cardView.layoutParams.width = size.toInt()
                 cardView.layoutParams.height = size.toInt()
                 textView.text = "No Frame"

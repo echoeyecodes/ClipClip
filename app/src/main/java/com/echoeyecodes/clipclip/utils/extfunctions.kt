@@ -100,7 +100,7 @@ fun String.toVideoQuality(): VideoQuality {
     }
 }
 
-fun Pair<Double, Double>.getDimensions(size: Double): Pair<Double, Double> {
+fun Pair<Float, Float>.getDimensions(size: Float): Pair<Float, Float> {
     val newDimension = if (this.first > this.second) {
         val value = (this.second / this.first) * size
         Pair(size, value)
