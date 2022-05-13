@@ -6,6 +6,8 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import com.echoeyecodes.clipclip.utils.AndroidUtilities
+import com.echoeyecodes.clipclip.utils.convertToAspectRatio
+import kotlin.math.ceil
 
 class VideoFrameView(context: Context, attributeSet: AttributeSet) :
     FrameLayout(context, attributeSet) {
@@ -46,26 +48,25 @@ class VideoFrameView(context: Context, attributeSet: AttributeSet) :
     fun updateBitmap(bitmap: Bitmap) {
         post {
 
-            val bitmapWidth = bitmap.width
-            val bitmapHeight = bitmap.height
+            val bitmapWidth = bitmap.width.toFloat()
+            val bitmapHeight = bitmap.height.toFloat()
 
-            val ratioBitmap = bitmapWidth / bitmapHeight.toFloat()
             val parentView = getParentView()
-            val ratioMax = parentView.width / parentView.height.toFloat()
+            val parentWidth = parentView.width.toFloat()
+            val parentHeight = parentView.height.toFloat()
 
-            var finalWidth = parentView.width
-            var finalHeight = parentView.height
+            val aspectRatio = convertToAspectRatio(
+                Pair(bitmapWidth, bitmapHeight),
+                Pair(parentWidth, parentHeight)
+            )
+            val finalWidth = aspectRatio.first
+            val finalHeight = aspectRatio.second
 
-            if (ratioMax > ratioBitmap) {
-                finalWidth = (finalHeight * ratioBitmap).toInt()
-            } else {
-                finalHeight = (finalWidth / ratioBitmap).toInt()
-            }
-
-            this.bitmap = createScaledBitmap(bitmap, finalWidth, finalHeight)
+            this.bitmap = createScaledBitmap(bitmap, finalWidth.toInt(), finalHeight.toInt())
             val newLayoutParams = layoutParams as LayoutParams
-            newLayoutParams.width = finalWidth
-            newLayoutParams.height = finalHeight
+
+            newLayoutParams.width = finalWidth.toInt()
+            newLayoutParams.height = finalHeight.toInt()
             layoutParams = newLayoutParams
             invalidate()
         }

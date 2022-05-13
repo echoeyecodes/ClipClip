@@ -110,3 +110,27 @@ fun Pair<Float, Float>.getDimensions(size: Float): Pair<Float, Float> {
     }
     return newDimension
 }
+
+fun convertToAspectRatio(
+    src: Pair<Float, Float>,
+    des: Pair<Float, Float>
+): Pair<Float, Float> {
+    val srcWidth = src.first
+    val srcHeight = src.second
+
+    val desWidth = des.first
+    val desHeight = des.second
+
+    val srcRatio = srcWidth / srcHeight
+    val desRatio = desWidth / desHeight
+
+    var finalWidth = desWidth
+    var finalHeight = desHeight
+
+    if (desRatio > srcRatio) {
+        finalWidth = finalHeight * srcRatio
+    } else {
+        finalHeight = finalWidth / srcRatio
+    }
+    return Pair(finalWidth, finalHeight)
+}

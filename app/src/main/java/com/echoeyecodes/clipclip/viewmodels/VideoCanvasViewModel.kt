@@ -4,6 +4,7 @@ import android.app.Application
 import android.graphics.Bitmap
 import androidx.lifecycle.*
 import com.echoeyecodes.clipclip.models.VideoCanvasModel
+import com.echoeyecodes.clipclip.utils.convertToAspectRatio
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -60,21 +61,14 @@ class VideoCanvasViewModel(application: Application) :
             viewModelScope.launch(Dispatchers.IO) {
                 val mat = Mat()
                 Utils.bitmapToMat(bitmap, mat)
-                val dimension =
-                    Pair(selectedDimension.width, selectedDimension.height)
+                val dimension = Pair(selectedDimension.width, selectedDimension.height)
                 val rows = mat.rows().toFloat()
                 val cols = mat.cols().toFloat()
-                val minimumSize = min(cols, rows)
 
-                val newDimension = if (dimension.first > dimension.second) {
-                    val value = (dimension.second / dimension.first) * minimumSize
-                    Pair(minimumSize, value)
-                } else {
-                    val value = (dimension.first / dimension.second) * minimumSize
-                    Pair(value, minimumSize)
-                }
-                val height = ceil(newDimension.second).toInt()
-                val width = ceil(newDimension.first).toInt()
+                val newDimension =
+                    convertToAspectRatio(Pair(dimension.first, dimension.second), Pair(cols, rows))
+                val height = newDimension.second
+                val width = newDimension.first
 
                 val rowMid = rows / 2
                 val colMid = cols / 2
