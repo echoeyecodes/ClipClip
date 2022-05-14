@@ -1,5 +1,6 @@
 package com.echoeyecodes.clipclip.fragments.videofragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.TextureView
@@ -20,6 +21,7 @@ import com.echoeyecodes.clipclip.models.VideoCanvasModel
 import com.echoeyecodes.clipclip.utils.AndroidUtilities
 import com.echoeyecodes.clipclip.utils.CustomItemDecoration
 import com.echoeyecodes.clipclip.viewmodels.VideoCanvasViewModel
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerView
 
 class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterCallback {
@@ -30,7 +32,8 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
     private lateinit var closeBtn: View
     private lateinit var doneBtn: View
     private val viewModel by lazy { ViewModelProvider(this)[VideoCanvasViewModel::class.java] }
-    var videoActivityCallback: VideoActivityCallback? = null
+    private var videoActivityCallback: VideoActivityCallback? = null
+    private var player: Player? = null
 
     companion object {
         const val TAG = "VIDEO_CANVAS_FRAGMENT"
@@ -62,25 +65,33 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
         val itemDecoration = CustomItemDecoration(10, 5)
         recyclerView.addItemDecoration(itemDecoration)
         recyclerView.adapter = adapter
+        playerView.setKeepContentOnPlayerReset(true)
 
         viewModel.videoDimensions.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
 
-        playerView.player = videoActivityCallback?.getPlayer()
-        playerView.setAspectRatioListener { _, _, _ ->
-            updateBackgroundFrame()
-        }
-
         viewModel.image.observe(viewLifecycleOwner) {
             if (it != null) {
                 playerBackground.updateBitmap(it)
-            } else playerBackground.resetBitmap()
+            } else {
+                playerBackground.resetBitmap()
+            }
         }
+        viewModel.getSelectedDimensionLiveData().observe(viewLifecycleOwner) {
+            updateBackgroundFrame()
+        }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        videoActivityCallback = context as VideoActivityCallback
     }
 
     override fun onResume() {
         super.onResume()
+        player = videoActivityCallback?.getPlayer()
+        playerView.player = player
         videoActivityCallback?.registerVideoActivityCallback(this)
     }
 
@@ -96,7 +107,6 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
     }
 
     private fun restorePlayerView() {
-        playerView.player = null
         videoActivityCallback?.restorePlayerView()
     }
 

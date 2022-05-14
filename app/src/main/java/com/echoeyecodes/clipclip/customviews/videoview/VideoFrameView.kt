@@ -36,13 +36,15 @@ class VideoFrameView(context: Context, attributeSet: AttributeSet) :
     }
 
     fun resetBitmap() {
-        this.bitmap = null
-        val newLayoutParams = layoutParams as LayoutParams
-        val parentView = getParentView()
-        newLayoutParams.width = parentView.width
-        newLayoutParams.height = parentView.height
-        layoutParams = newLayoutParams
-        invalidate()
+        post {
+            this.bitmap = null
+            val newLayoutParams = layoutParams as LayoutParams
+            val parentView = getParentView()
+            newLayoutParams.width = parentView.width
+            newLayoutParams.height = parentView.height
+            layoutParams = newLayoutParams
+            invalidate()
+        }
     }
 
     fun updateBitmap(bitmap: Bitmap) {

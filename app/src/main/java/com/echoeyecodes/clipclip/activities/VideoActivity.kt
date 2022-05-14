@@ -61,8 +61,12 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     private val playerRunnable = object : Runnable {
         override fun run() {
             checkPlayerProgress()
-            handler.postDelayed(this, 30)
+            handler.postDelayed(this, DELAY_MILLIS)
         }
+    }
+
+    companion object {
+        const val DELAY_MILLIS = 30L
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +74,9 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         setContentView(binding.root)
         textView = binding.text
         timestamp = binding.timestamp
-        playerView = binding.playerView
+        playerView = binding.playerView.apply {
+            setKeepContentOnPlayerReset(true)
+        }
         closeBtn = binding.toolbar.closeBtn
         canvasBtn = binding.options.canvasBtn
         timeBtn = binding.options.timeBtn
@@ -131,17 +137,16 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         canvasBtn.setOnClickListener { showVideoCanvasFragment() }
     }
 
-    private fun getVideoCanvasFragment(videoActivityCallback: VideoActivityCallback): VideoCanvasFragment {
-        val fragment =
-            supportFragmentManager.findFragmentByTag(VideoCanvasFragment.TAG) as VideoCanvasFragment?
-                ?: VideoCanvasFragment().apply {
-                    this.videoActivityCallback = videoActivityCallback
-                }
-        return fragment
+    private fun getVideoCanvasFragment(): VideoCanvasFragment? {
+        return supportFragmentManager.findFragmentByTag(VideoCanvasFragment.TAG) as VideoCanvasFragment?
+    }
+
+    private fun initVideoCanvasFragment(): VideoCanvasFragment {
+        return VideoCanvasFragment()
     }
 
     private fun showVideoCanvasFragment() {
-        val fragment = getVideoCanvasFragment(this)
+        val fragment = getVideoCanvasFragment() ?: initVideoCanvasFragment()
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragment_container_view, fragment, VideoCanvasFragment.TAG)
         transaction.addToBackStack(VideoCanvasFragment.TAG)
@@ -189,15 +194,17 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     }
 
     private fun initPlayer() {
-        player = ExoPlayer.Builder(this).build().also {
-            playerView.player = it
-            val mediaItem = MediaItem.fromUri(viewModel.uri)
-            it.setMediaItem(mediaItem)
+        if (player == null) {
+            player = ExoPlayer.Builder(this).build().also {
+                playerView.player = it
+                val mediaItem = MediaItem.fromUri(viewModel.uri)
+                it.setMediaItem(mediaItem)
 //            it.setVideoTextureView(textureView)
-            it.seekTo(viewModel.currentPosition)
-            it.playWhenReady = viewModel.isPlaying
-            it.prepare()
-            it.addListener(this)
+                it.seekTo(viewModel.currentPosition)
+                it.playWhenReady = viewModel.isPlaying
+                it.prepare()
+                it.addListener(this)
+            }
         }
     }
 
@@ -288,9 +295,12 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         player?.let {
             val position = it.currentPosition
             updateVideoProgressMarker(position)
-            if (position >= viewModel.getEndTime()) {
+            if (position >= viewModel.getEndTime() - DELAY_MILLIS) {
                 viewModel.currentPosition = viewModel.getStartTime()
-                it.pause()
+                if (it.isPlaying) {
+                    it.seekTo(position - DELAY_MILLIS)
+                    it.pause()
+                }
             }
             videoActivityCallbacks.forEach { it.onPlayerProgress(position) }
         }
@@ -363,11 +373,12 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     }
 
     override fun closeFragment() {
-        val fragment = getVideoCanvasFragment(this)
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.remove(fragment)
-        transaction.commitAllowingStateLoss()
-        supportFragmentManager.popBackStack()
+        getVideoCanvasFragment()?.let {
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.remove(it)
+            transaction.commitAllowingStateLoss()
+            supportFragmentManager.popBackStack()
+        }
     }
 
     override fun getPlayer(): Player? {
@@ -376,7 +387,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
 
     override fun restorePlayerView() {
         playerView.player = null
-        playerView.player = getPlayer()
+        playerView.player = player
     }
 
 }

@@ -53,6 +53,10 @@ class VideoCanvasViewModel(application: Application) :
         selectedDimensionsLiveData.value = dimension
     }
 
+    fun getSelectedDimensionLiveData(): LiveData<VideoCanvasModel> {
+        return selectedDimensionsLiveData
+    }
+
     fun blurFrame(bitmap: Bitmap) {
         val selectedDimension = selectedDimensionsLiveData.value ?: VideoCanvasModel(0.0f, 0.0f)
         if (selectedDimension.width == 0.0f && selectedDimension.height == 0.0f) {
