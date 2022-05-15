@@ -1,7 +1,17 @@
 package com.echoeyecodes.clipclip.utils
 
 import android.content.res.Resources
+import android.graphics.Bitmap
 import android.util.TypedValue
+import androidx.lifecycle.viewModelScope
+import com.echoeyecodes.clipclip.models.VideoCanvasModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.opencv.android.Utils
+import org.opencv.core.Mat
+import org.opencv.core.Size
+import org.opencv.imgproc.Imgproc
 import kotlin.math.max
 
 
@@ -133,4 +143,42 @@ fun convertToAspectRatio(
         finalHeight = finalWidth / srcRatio
     }
     return Pair(finalWidth, finalHeight)
+}
+
+
+suspend fun Bitmap.blurFrame(selectedDimension: VideoCanvasModel): Bitmap? {
+    return withContext(Dispatchers.IO) {
+        if (selectedDimension.width == 0.0f && selectedDimension.height == 0.0f) {
+            null
+        } else {
+            val bitmap = this@blurFrame
+
+            val mat = Mat()
+            Utils.bitmapToMat(bitmap, mat)
+            val dimension = Pair(selectedDimension.width, selectedDimension.height)
+            val rows = mat.rows().toFloat()
+            val cols = mat.cols().toFloat()
+
+            val newDimension =
+                convertToAspectRatio(Pair(dimension.first, dimension.second), Pair(cols, rows))
+            val height = newDimension.second
+            val width = newDimension.first
+
+            val rowMid = rows / 2
+            val colMid = cols / 2
+
+            val rowStart = (rowMid - (height / 2)).toInt()
+            val rowEnd = (rowMid + (height / 2)).toInt()
+            val colStart = (colMid - (width / 2)).toInt()
+            val colEnd = (colMid + (width / 2)).toInt()
+
+            val submat = mat.submat(rowStart, rowEnd, colStart, colEnd)
+            Imgproc.blur(mat, mat, Size(16.0, 16.0))
+
+            val newBitmap =
+                Bitmap.createBitmap(submat.width(), submat.height(), Bitmap.Config.ARGB_8888)
+            Utils.matToBitmap(submat, newBitmap)
+            newBitmap
+        }
+    }
 }

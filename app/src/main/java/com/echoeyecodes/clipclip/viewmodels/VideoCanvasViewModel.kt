@@ -1,27 +1,14 @@
 package com.echoeyecodes.clipclip.viewmodels
 
 import android.app.Application
-import android.graphics.Bitmap
 import androidx.lifecycle.*
 import com.echoeyecodes.clipclip.models.VideoCanvasModel
-import com.echoeyecodes.clipclip.utils.convertToAspectRatio
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.opencv.android.OpenCVLoader
-import org.opencv.android.Utils
-import org.opencv.core.Mat
-import org.opencv.core.Size
-import org.opencv.imgproc.Imgproc
-import kotlin.math.ceil
-import kotlin.math.min
 
 
 class VideoCanvasViewModel(application: Application) :
-    AndroidViewModel(application) {
-    val image = MutableLiveData<Bitmap?>()
+    VideoFrameViewModel(application) {
     val videoDimensions: LiveData<List<VideoCanvasModel>>
-    private var selectedDimensionsLiveData = MutableLiveData(VideoCanvasModel(0.0f, 0.0f))
 
     init {
         videoDimensions = Transformations.map(selectedDimensionsLiveData) {
@@ -51,46 +38,5 @@ class VideoCanvasViewModel(application: Application) :
 
     fun setSelectedDimension(dimension: VideoCanvasModel) {
         selectedDimensionsLiveData.value = dimension
-    }
-
-    fun getSelectedDimensionLiveData(): LiveData<VideoCanvasModel> {
-        return selectedDimensionsLiveData
-    }
-
-    fun blurFrame(bitmap: Bitmap) {
-        val selectedDimension = selectedDimensionsLiveData.value ?: VideoCanvasModel(0.0f, 0.0f)
-        if (selectedDimension.width == 0.0f && selectedDimension.height == 0.0f) {
-            image.value = null
-        } else
-            viewModelScope.launch(Dispatchers.IO) {
-                val mat = Mat()
-                Utils.bitmapToMat(bitmap, mat)
-                val dimension = Pair(selectedDimension.width, selectedDimension.height)
-                val rows = mat.rows().toFloat()
-                val cols = mat.cols().toFloat()
-
-                val newDimension =
-                    convertToAspectRatio(Pair(dimension.first, dimension.second), Pair(cols, rows))
-                val height = newDimension.second
-                val width = newDimension.first
-
-                val rowMid = rows / 2
-                val colMid = cols / 2
-
-                val rowStart = (rowMid - (height / 2)).toInt()
-                val rowEnd = (rowMid + (height / 2)).toInt()
-                val colStart = (colMid - (width / 2)).toInt()
-                val colEnd = (colMid + (width / 2)).toInt()
-
-                val submat = mat.submat(rowStart, rowEnd, colStart, colEnd)
-                Imgproc.blur(mat, mat, Size(16.0, 16.0))
-
-                val newBitmap =
-                    Bitmap.createBitmap(submat.width(), submat.height(), Bitmap.Config.ARGB_8888)
-                Utils.matToBitmap(submat, newBitmap)
-                withContext(Dispatchers.Main) {
-                    image.value = (newBitmap)
-                }
-            }
     }
 }

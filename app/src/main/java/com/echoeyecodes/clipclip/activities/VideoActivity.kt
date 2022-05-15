@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Parcelable
+import android.view.TextureView
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -126,6 +127,16 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
 
         viewModel.getTimestampLiveData().observe(this) {
             timestamp.text = it
+        }
+
+        viewModel.image.observe(this) {
+            if (it != null) {
+                binding.playerBackground.updateBitmap(it)
+            } else binding.playerBackground.resetBitmap()
+        }
+
+        viewModel.getSelectedDimensionsLiveData().observe(this) {
+            updateBackgroundFrame()
         }
 
         val positions = viewModel.getMarkerPositions()
@@ -388,6 +399,12 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     override fun restorePlayerView() {
         playerView.player = null
         playerView.player = player
+    }
+
+    private fun updateBackgroundFrame() {
+        (playerView.videoSurfaceView as TextureView?)?.bitmap?.let {
+            viewModel.blurFrame(it)
+        }
     }
 
 }

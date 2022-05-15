@@ -78,7 +78,7 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
                 playerBackground.resetBitmap()
             }
         }
-        viewModel.getSelectedDimensionLiveData().observe(viewLifecycleOwner) {
+        viewModel.getSelectedDimensionsLiveData().observe(viewLifecycleOwner) {
             updateBackgroundFrame()
         }
     }

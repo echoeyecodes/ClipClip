@@ -3,47 +3,13 @@ package com.echoeyecodes.clipclip.viewmodels
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import android.graphics.Bitmap
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import androidx.lifecycle.*
-import com.echoeyecodes.clipclip.FileUtils
-import com.echoeyecodes.clipclip.utils.AndroidUtilities
-import com.echoeyecodes.clipclip.utils.getScreenSize
-import com.echoeyecodes.clipclip.utils.toSeconds
-import com.echoeyecodes.clipclip.utils.withPrefix
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.echoeyecodes.clipclip.utils.*
 import org.opencv.android.OpenCVLoader
-import org.opencv.android.Utils
-import org.opencv.core.Mat
-import org.opencv.core.Size
-import org.opencv.imgproc.Imgproc
-import org.opencv.videoio.VideoCapture
-//import org.bytedeco.javacv.AndroidFrameConverter
-//import org.bytedeco.javacv.FFmpegFrameGrabber
-//import org.bytedeco.javacv.Frame
-//import org.bytedeco.javacv.OpenCVFrameConverter
-//import org.bytedeco.opencv.global.opencv_videoio.*
-//import org.bytedeco.opencv.opencv_core.GpuMat
-//import org.bytedeco.opencv.opencv_core.Mat
-//import org.bytedeco.opencv.opencv_core.UMat
-//import org.bytedeco.opencv.opencv_videoio.VideoCapture
-import org.opencv.videoio.Videoio
-import org.opencv.videoio.Videoio.CAP_PROP_FPS
-import org.opencv.videoio.Videoio.CAP_PROP_FRAME_COUNT
-//import org.bytedeco.javacv.AndroidFrameConverter
-//import org.bytedeco.javacv.FFmpegFrameGrabber
-//import org.bytedeco.javacv.OpenCVFrameConverter
-//import org.bytedeco.opencv.opencv_core.Mat
-//import org.bytedeco.opencv.opencv_videoio.VideoCapture
-//import org.bytedeco.opencv.opencv_videostab.VideoFileSource
 import kotlin.math.max
-import kotlin.math.min
 
 class VideoActivityViewModelFactory(private val uri: String, private val context: Context) :
     ViewModelProvider.Factory {
@@ -56,7 +22,7 @@ class VideoActivityViewModelFactory(private val uri: String, private val context
 }
 
 class VideoActivityViewModel(val uri: String, application: Application) :
-    AndroidViewModel(application) {
+    VideoFrameViewModel(application) {
     private val duration: Long
     var isPlaying = true
     private var startTime: Long = 0L
