@@ -227,14 +227,17 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     public override fun onStart() {
         super.onStart()
         if (Util.SDK_INT >= 24) {
+            initFFMPEGListener()
+            handler.postDelayed(playerRunnable, 0)
             initPlayer()
         }
     }
 
     public override fun onResume() {
         super.onResume()
-        initFFMPEGListener()
         if ((Util.SDK_INT < 24 || player == null)) {
+            initFFMPEGListener()
+            handler.postDelayed(playerRunnable, 0)
             initPlayer()
         }
     }
@@ -242,6 +245,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     public override fun onPause() {
         super.onPause()
         if (Util.SDK_INT < 24) {
+            handler.removeCallbacks(playerRunnable)
             releasePlayer()
         }
     }
@@ -250,6 +254,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     public override fun onStop() {
         super.onStop()
         if (Util.SDK_INT >= 24) {
+            handler.removeCallbacks(playerRunnable)
             releasePlayer()
         }
     }
@@ -295,15 +300,6 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
                 updateVideoProgressMarker(player?.currentPosition ?: 0)
             }
 
-        }
-    }
-
-    override fun onIsPlayingChanged(isPlaying: Boolean) {
-        super.onIsPlayingChanged(isPlaying)
-        if (isPlaying) {
-            handler.postDelayed(playerRunnable, 0)
-        } else {
-            handler.removeCallbacks(playerRunnable)
         }
     }
 
