@@ -310,9 +310,9 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             if (position >= viewModel.getEndTime() - DELAY_MILLIS) {
                 viewModel.currentPosition = viewModel.getStartTime()
                 if (it.isPlaying) {
-                    it.seekTo(position - DELAY_MILLIS)
-                    it.pause()
+                    it.seekTo(viewModel.getStartTime())
                 }
+                it.pause()
             }
             videoActivityCallbacks.forEach { it.onPlayerProgress(position) }
         }
