@@ -22,7 +22,7 @@ class VideoActivityViewModelFactory(private val uri: String, private val context
 }
 
 class VideoActivityViewModel(val uri: String, application: Application) :
-    VideoFrameViewModel(application) {
+    VideoFrameViewModel(null, application) {
     private val duration: Long
     var isPlaying = true
     private var startTime: Long = 0L

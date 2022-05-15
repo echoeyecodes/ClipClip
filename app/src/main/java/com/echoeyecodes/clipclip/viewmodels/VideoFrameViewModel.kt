@@ -10,9 +10,11 @@ import com.echoeyecodes.clipclip.models.VideoCanvasModel
 import com.echoeyecodes.clipclip.utils.blurFrame
 import kotlinx.coroutines.launch
 
-abstract class VideoFrameViewModel(application: Application) : AndroidViewModel(application) {
+abstract class VideoFrameViewModel(videoCanvasModel: VideoCanvasModel?, application: Application) :
+    AndroidViewModel(application) {
     val image = MutableLiveData<Bitmap?>()
-    protected var selectedDimensionsLiveData = MutableLiveData(VideoCanvasModel(0.0f, 0.0f))
+    protected var selectedDimensionsLiveData =
+        MutableLiveData(videoCanvasModel ?: VideoCanvasModel(0.0f, 0.0f))
 
     fun blurFrame(bitmap: Bitmap) {
         viewModelScope.launch {
@@ -24,5 +26,9 @@ abstract class VideoFrameViewModel(application: Application) : AndroidViewModel(
 
     fun getSelectedDimensionsLiveData(): LiveData<VideoCanvasModel> {
         return selectedDimensionsLiveData
+    }
+
+    fun setSelectedDimension(dimension: VideoCanvasModel) {
+        selectedDimensionsLiveData.value = dimension
     }
 }

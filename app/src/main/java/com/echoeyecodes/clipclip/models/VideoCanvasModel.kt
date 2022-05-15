@@ -1,5 +1,7 @@
 package com.echoeyecodes.clipclip.models
 
-data class VideoCanvasModel(val width: Float, val height: Float){
+import java.io.Serializable
+
+data class VideoCanvasModel(val width: Float, val height: Float) : Serializable {
     var isSelected = false
 }

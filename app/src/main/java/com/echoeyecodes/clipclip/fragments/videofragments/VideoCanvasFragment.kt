@@ -21,6 +21,7 @@ import com.echoeyecodes.clipclip.models.VideoCanvasModel
 import com.echoeyecodes.clipclip.utils.AndroidUtilities
 import com.echoeyecodes.clipclip.utils.CustomItemDecoration
 import com.echoeyecodes.clipclip.viewmodels.VideoCanvasViewModel
+import com.echoeyecodes.clipclip.viewmodels.VideoCanvasViewModelFactory
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerView
 
@@ -31,7 +32,7 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
     private lateinit var recyclerView: RecyclerView
     private lateinit var closeBtn: View
     private lateinit var doneBtn: View
-    private val viewModel by lazy { ViewModelProvider(this)[VideoCanvasViewModel::class.java] }
+    private lateinit var viewModel: VideoCanvasViewModel
     private var videoActivityCallback: VideoActivityCallback? = null
     private var player: Player? = null
 
@@ -52,7 +53,12 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
         closeBtn = binding.toolbar.closeBtn
         doneBtn = binding.toolbar.doneBtn
 
+        val videoCanvasModel = arguments?.getSerializable("video-canvas") as VideoCanvasModel?
+        val viewModelFactory = VideoCanvasViewModelFactory(videoCanvasModel, requireContext())
+        viewModel = ViewModelProvider(this, viewModelFactory)[VideoCanvasViewModel::class.java]
+
         closeBtn.setOnClickListener { videoActivityCallback?.closeFragment() }
+        doneBtn.setOnClickListener { setVideoBackground() }
         return binding.root
     }
 
@@ -118,6 +124,10 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
         (playerView.videoSurfaceView as TextureView?)?.bitmap?.let {
             viewModel.blurFrame(it)
         }
+    }
+
+    private fun setVideoBackground() {
+        videoActivityCallback?.setVideoBackground(viewModel.getSelectedDimensionsLiveData().value!!)
     }
 
     override fun onCanvasItemSelected(model: VideoCanvasModel) {

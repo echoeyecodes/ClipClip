@@ -23,6 +23,7 @@ import com.echoeyecodes.clipclip.fragments.dialogfragments.ProgressDialogFragmen
 import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoConfigurationDialogFragment
 import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoTimestampDialogFragment
 import com.echoeyecodes.clipclip.fragments.videofragments.VideoCanvasFragment
+import com.echoeyecodes.clipclip.models.VideoCanvasModel
 import com.echoeyecodes.clipclip.trimmer.VideoTrimManager
 import com.echoeyecodes.clipclip.utils.*
 import com.echoeyecodes.clipclip.viewmodels.VideoActivityViewModel
@@ -153,7 +154,11 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
     }
 
     private fun initVideoCanvasFragment(): VideoCanvasFragment {
-        return VideoCanvasFragment()
+        return VideoCanvasFragment().apply {
+            arguments = Bundle().apply {
+                putSerializable("video-canvas", viewModel.getSelectedDimensionsLiveData().value)
+            }
+        }
     }
 
     private fun showVideoCanvasFragment() {
@@ -315,6 +320,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             }
             videoActivityCallbacks.forEach { it.onPlayerProgress(position) }
         }
+        updateBackgroundFrame()
     }
 
     private fun updateVideoProgressMarker(value: Long) {
@@ -390,6 +396,11 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             transaction.commitAllowingStateLoss()
             supportFragmentManager.popBackStack()
         }
+    }
+
+    override fun setVideoBackground(videoCanvasModel: VideoCanvasModel) {
+        viewModel.setSelectedDimension(videoCanvasModel)
+        closeFragment()
     }
 
     override fun getPlayer(): Player? {

@@ -1,13 +1,30 @@
 package com.echoeyecodes.clipclip.viewmodels
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.*
 import com.echoeyecodes.clipclip.models.VideoCanvasModel
 import org.opencv.android.OpenCVLoader
 
+class VideoCanvasViewModelFactory(
+    private val videoCanvasModel: VideoCanvasModel?,
+    private val context: Context
+) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(VideoCanvasViewModel::class.java)) {
+            return VideoCanvasViewModel(
+                videoCanvasModel,
+                context.applicationContext as Application
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
 
-class VideoCanvasViewModel(application: Application) :
-    VideoFrameViewModel(application) {
+
+class VideoCanvasViewModel(videoCanvasModel: VideoCanvasModel?, application: Application) :
+    VideoFrameViewModel(videoCanvasModel, application) {
     val videoDimensions: LiveData<List<VideoCanvasModel>>
 
     init {
@@ -34,9 +51,5 @@ class VideoCanvasViewModel(application: Application) :
             it.isSelected = it == selectedDimension
             it
         }
-    }
-
-    fun setSelectedDimension(dimension: VideoCanvasModel) {
-        selectedDimensionsLiveData.value = dimension
     }
 }
