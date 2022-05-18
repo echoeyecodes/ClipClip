@@ -58,7 +58,7 @@ class FFMPEGCommand private constructor(val command: String) {
                 "[copy]scale=-1:iw/(${canvasModel.width}/${canvasModel.height}),crop=w=ih/(${canvasModel.height}/${canvasModel.width})"
             }
             this.filter =
-                "-vf split=2[original][copy];$canvasCrop,boxblur=luma_radius=min(h\\,w)/20:luma_power=1:chroma_radius=min(cw\\,ch)/20:chroma_power=1[blurred];[blurred][original]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2"
+                "-vf split=2[original][copy];$canvasCrop,gblur=sigma=20[blurred];[blurred][original]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2"
             return this
         }
 
