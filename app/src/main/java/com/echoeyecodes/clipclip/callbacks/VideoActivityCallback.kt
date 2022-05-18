@@ -12,4 +12,7 @@ interface VideoActivityCallback {
     fun setVideoFrameProperties(videoCanvasModel: VideoCanvasModel, blurFactor: Int)
     fun onBlurSeekStarted()
     fun onBlurSeekEnded()
+    fun playVideo()
+    fun pauseVideo()
+    fun togglePlayState()
 }

@@ -5,4 +5,5 @@ import com.google.android.exoplayer2.ui.PlayerView
 
 interface VideoPlayerCallback {
     fun onPlayerProgress(timestamp: Long)
+    fun onIsPlaying(isPlaying: Boolean)
 }

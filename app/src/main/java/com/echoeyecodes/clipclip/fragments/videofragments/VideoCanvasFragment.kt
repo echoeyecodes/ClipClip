@@ -7,6 +7,7 @@ import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -67,7 +68,17 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
         closeBtn.setOnClickListener { videoActivityCallback?.closeFragment() }
         doneBtn.setOnClickListener { setVideoFrameProperties() }
         seekBar.setOnSeekBarChangeListener(this)
+        binding.playBtn.setOnClickListener { playVideo() }
+        binding.playerContainer.setOnClickListener { togglePlayState() }
         return binding.root
+    }
+
+    private fun togglePlayState() {
+        videoActivityCallback?.togglePlayState()
+    }
+
+    private fun playVideo() {
+        videoActivityCallback?.playVideo()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -106,6 +117,7 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
         super.onResume()
         player = videoActivityCallback?.getPlayer()
         playerView.player = player
+        onIsPlaying(player?.isPlaying ?: false)
         videoActivityCallback?.registerVideoActivityCallback(this)
     }
 
@@ -126,6 +138,10 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
 
     override fun onPlayerProgress(timestamp: Long) {
         updateBackgroundFrame()
+    }
+
+    override fun onIsPlaying(isPlaying: Boolean) {
+        binding.playBtn.isVisible = !isPlaying
     }
 
     private fun updateBackgroundFrame() {

@@ -113,15 +113,9 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             selectionCallback = this@VideoActivity
         }
 
-        binding.playerContainer.setOnClickListener {
-            player?.let {
-                if (it.isPlaying) {
-                    pauseVideo()
-                } else {
-                    playVideo()
-                }
-            }
-        }
+        binding.playerContainer.setOnClickListener { togglePlayState() }
+
+        binding.playBtn.setOnClickListener { playVideo() }
 
         viewModel.getTimestampDifferenceLiveData().observe(this) {
             durationTextView.text = it
@@ -150,6 +144,16 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         canvasBtn.setOnClickListener { showVideoCanvasFragment() }
     }
 
+    override fun togglePlayState() {
+        player?.let {
+            if (it.isPlaying) {
+                pauseVideo()
+            } else {
+                playVideo()
+            }
+        }
+    }
+
     private fun getVideoCanvasFragment(): VideoCanvasFragment? {
         return supportFragmentManager.findFragmentByTag(VideoCanvasFragment.TAG) as VideoCanvasFragment?
     }
@@ -161,6 +165,12 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
                 putInt("blurFactor", viewModel.blurFactor)
             }
         }
+    }
+
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+        super.onIsPlayingChanged(isPlaying)
+        binding.playBtn.isVisible = !isPlaying
+        videoActivityCallbacks.forEach { it.onIsPlaying(isPlaying) }
     }
 
     private fun showVideoCanvasFragment() {
@@ -192,14 +202,14 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         AndroidUtilities.showFragment(supportFragmentManager, videoConfigurationDialogFragment)
     }
 
-    private fun playVideo() {
+    override fun playVideo() {
         player?.let {
             it.seekTo(viewModel.currentPosition)
             it.play()
         }
     }
 
-    private fun pauseVideo() {
+    override fun pauseVideo() {
         player?.let {
             viewModel.currentPosition = it.currentPosition
             it.pause()
