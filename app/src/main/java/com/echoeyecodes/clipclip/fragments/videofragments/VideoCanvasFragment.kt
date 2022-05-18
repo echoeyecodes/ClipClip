@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SeekBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,13 +26,15 @@ import com.echoeyecodes.clipclip.viewmodels.VideoCanvasViewModelFactory
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerView
 
-class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterCallback {
+class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterCallback,
+    SeekBar.OnSeekBarChangeListener {
     private lateinit var playerView: PlayerView
     private lateinit var playerBackground: VideoFrameView
     private lateinit var binding: FragmentVideoCanvasBinding
     private lateinit var recyclerView: RecyclerView
     private lateinit var closeBtn: View
     private lateinit var doneBtn: View
+    private lateinit var seekBar: SeekBar
     private lateinit var viewModel: VideoCanvasViewModel
     private var videoActivityCallback: VideoActivityCallback? = null
     private var player: Player? = null
@@ -52,13 +55,16 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
         playerBackground = binding.playerBackground
         closeBtn = binding.toolbar.closeBtn
         doneBtn = binding.toolbar.doneBtn
+        seekBar = binding.seekBar
 
         val videoCanvasModel = arguments?.getSerializable("video-canvas") as VideoCanvasModel?
         val viewModelFactory = VideoCanvasViewModelFactory(videoCanvasModel, requireContext())
         viewModel = ViewModelProvider(this, viewModelFactory)[VideoCanvasViewModel::class.java]
+        seekBar.progress = viewModel.blurFactor
 
         closeBtn.setOnClickListener { videoActivityCallback?.closeFragment() }
         doneBtn.setOnClickListener { setVideoBackground() }
+        seekBar.setOnSeekBarChangeListener(this)
         return binding.root
     }
 
@@ -132,5 +138,17 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
 
     override fun onCanvasItemSelected(model: VideoCanvasModel) {
         viewModel.setSelectedDimension(model)
+    }
+
+    override fun onProgressChanged(p0: SeekBar, p1: Int, p2: Boolean) {
+        viewModel.blurFactor = (p1)
+    }
+
+    override fun onStartTrackingTouch(p0: SeekBar) {
+        videoActivityCallback?.onBlurSeekStarted()
+    }
+
+    override fun onStopTrackingTouch(p0: SeekBar?) {
+        videoActivityCallback?.onBlurSeekEnded()
     }
 }

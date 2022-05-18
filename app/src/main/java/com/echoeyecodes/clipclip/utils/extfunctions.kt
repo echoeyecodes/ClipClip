@@ -146,7 +146,7 @@ fun convertToAspectRatio(
 }
 
 
-suspend fun Bitmap.blurFrame(selectedDimension: VideoCanvasModel): Bitmap? {
+suspend fun Bitmap.blurFrame(selectedDimension: VideoCanvasModel, blurFactor: Int): Bitmap? {
     return withContext(Dispatchers.IO) {
         if (selectedDimension.width == 0.0f && selectedDimension.height == 0.0f) {
             null
@@ -173,7 +173,7 @@ suspend fun Bitmap.blurFrame(selectedDimension: VideoCanvasModel): Bitmap? {
             val colEnd = (colMid + (width / 2)).toInt()
 
             val submat = mat.submat(rowStart, rowEnd, colStart, colEnd)
-            Imgproc.blur(mat, mat, Size(16.0, 16.0))
+            Imgproc.blur(mat, mat, Size(blurFactor.toDouble(), blurFactor.toDouble()))
 
             val newBitmap =
                 Bitmap.createBitmap(submat.width(), submat.height(), Bitmap.Config.ARGB_8888)

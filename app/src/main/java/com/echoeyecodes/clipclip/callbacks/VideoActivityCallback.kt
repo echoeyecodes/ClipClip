@@ -10,4 +10,6 @@ interface VideoActivityCallback {
     fun removeVideoActivityCallback(videoPlayerCallback: VideoPlayerCallback)
     fun closeFragment()
     fun setVideoBackground(videoCanvasModel: VideoCanvasModel)
+    fun onBlurSeekStarted()
+    fun onBlurSeekEnded()
 }

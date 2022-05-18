@@ -409,6 +409,14 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         closeFragment()
     }
 
+    override fun onBlurSeekStarted() {
+        pauseVideo()
+    }
+
+    override fun onBlurSeekEnded() {
+        playVideo()
+    }
+
     override fun getPlayer(): Player? {
         return player
     }

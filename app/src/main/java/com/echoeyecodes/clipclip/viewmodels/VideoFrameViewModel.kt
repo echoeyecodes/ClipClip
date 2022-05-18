@@ -10,16 +10,25 @@ import com.echoeyecodes.clipclip.models.VideoCanvasModel
 import com.echoeyecodes.clipclip.utils.blurFrame
 import kotlinx.coroutines.launch
 
+
+/**
+ * Blur factor could be a live data that calls on the blurFrame method via a livedata mediator
+ * but that is totally unnecessary because the player handler in the VideoActivity checks for player
+ * progress every 30milliseconds. The canvas fragment listens to this handler and updates the canvas from
+ * every 30ms as well
+ */
+
 abstract class VideoFrameViewModel(videoCanvasModel: VideoCanvasModel?, application: Application) :
     AndroidViewModel(application) {
     val image = MutableLiveData<Bitmap?>()
+    var blurFactor = 30
     protected var selectedDimensionsLiveData =
         MutableLiveData(videoCanvasModel ?: VideoCanvasModel(0.0f, 0.0f))
 
     fun blurFrame(bitmap: Bitmap) {
         viewModelScope.launch {
             val selectedDimension = selectedDimensionsLiveData.value ?: VideoCanvasModel(0.0f, 0.0f)
-            val newBitmap = bitmap.blurFrame(selectedDimension)
+            val newBitmap = bitmap.blurFrame(selectedDimension, blurFactor)
             image.value = newBitmap
         }
     }
@@ -35,4 +44,5 @@ abstract class VideoFrameViewModel(videoCanvasModel: VideoCanvasModel?, applicat
     fun setSelectedDimension(dimension: VideoCanvasModel) {
         selectedDimensionsLiveData.value = dimension
     }
+
 }
