@@ -10,11 +10,11 @@ class FFMPEGCommand private constructor(val command: String) {
 
     class Builder {
         private var inputUri: String? = null
-        private var scale: String = ""
         private var format: String = ""
         private var outputUri: String? = null
         private var trim: String = ""
-        private var filter: String = ""
+        private var scaleFilter: String = ""
+        private var blurFilter = ""
 
         fun init(context: Context, inputUri: Uri, outputUri: Uri): Builder {
             inputUri(context, inputUri)
@@ -58,30 +58,30 @@ class FFMPEGCommand private constructor(val command: String) {
             } else {
                 "[copy]scale=-1:iw/(${canvasModel.width}/${canvasModel.height}),crop=w=ih/(${canvasModel.height}/${canvasModel.width})"
             }
-            this.filter =
-                "-vf split=2[original][copy];$canvasCrop,gblur=sigma=$blurFactor[blurred];[blurred][original]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2"
+            this.blurFilter =
+                ", split=2[original][copy];$canvasCrop,gblur=sigma=$blurFactor[blurred];[blurred][original]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2"
             return this
         }
 
         fun quality(qty: VideoQuality): Builder {
             val scale = when (qty) {
                 VideoQuality.VERY_LOW -> {
-                    "-vf scale=trunc(iw/10)*2:trunc(ih/10)*2"
+                    "scale=trunc(iw/10)*2:trunc(ih/10)*2"
                 }
                 VideoQuality.LOW -> {
-                    "-vf scale=trunc(iw/8)*2:trunc(ih/8)*2"
+                    "scale=trunc(iw/8)*2:trunc(ih/8)*2"
                 }
                 VideoQuality.MEDIUM -> {
-                    "-vf scale=trunc(iw/6)*2:trunc(ih/6)*2"
+                    "scale=trunc(iw/6)*2:trunc(ih/6)*2"
                 }
                 VideoQuality.HIGH -> {
-                    "-vf scale=trunc(iw/4)*2:trunc(ih/4)*2"
+                    "scale=trunc(iw/4)*2:trunc(ih/4)*2"
                 }
                 else -> {
                     ""
                 }
             }
-            this.scale = scale
+            this.scaleFilter = scale
             return this
         }
 
@@ -95,7 +95,7 @@ class FFMPEGCommand private constructor(val command: String) {
             if (inputUri == null || outputUri == null) {
                 throw Exception("Input/Output Uri must be initialized")
             }
-            val command = "$trim -i $inputUri $format $filter $outputUri"
+            val command = "$trim -i $inputUri $format -vf \"$scaleFilter $blurFilter\" $outputUri"
             AndroidUtilities.log(command)
             return FFMPEGCommand(command)
         }

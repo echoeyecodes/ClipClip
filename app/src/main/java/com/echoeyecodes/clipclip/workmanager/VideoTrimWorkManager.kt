@@ -10,6 +10,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.echoeyecodes.clipclip.R
 import com.echoeyecodes.clipclip.activities.VideoActivity
+import com.echoeyecodes.clipclip.models.VideoBlurModel
 import com.echoeyecodes.clipclip.models.VideoCanvasModel
 import com.echoeyecodes.clipclip.models.VideoConfigModel
 import com.echoeyecodes.clipclip.receivers.VideoTrimBroadcastReceiver
@@ -63,21 +64,33 @@ class VideoTrimWorkManager(context: Context, workerParams: WorkerParameters) :
                 val endTime = inputData.getLong("endTime", 0L)
                 val splitTime = inputData.getLong("splitTime", 0L)
                 val _format = inputData.getString("format")
+                val quality = (inputData.getString("quality") ?: "normal").toVideoQuality()
+
+                val shouldApplyBlurFilter = inputData.getBoolean("applyBlurFilter", false)
                 val targetWidth = inputData.getFloat("targetWidth", 0f)
                 val targetHeight = inputData.getFloat("targetHeight", 0f)
                 val videoWidth = inputData.getFloat("videoWidth", 0f)
                 val videoHeight = inputData.getFloat("videoHeight", 0f)
                 val blurFactor = inputData.getInt("blurFactor", 0)
-                val quality = (inputData.getString("quality") ?: "normal").toVideoQuality()
+
                 val format = if (_format == ".mp3") {
                     VideoFormat.MP3
                 } else VideoFormat.MP4
+
+                val blurModel: VideoBlurModel? =
+                    if (format == VideoFormat.MP3 || !shouldApplyBlurFilter) {
+                        null
+                    } else {
+                        VideoBlurModel(
+                            VideoCanvasModel(targetWidth, targetHeight),
+                            Dimension(videoWidth, videoHeight),
+                            blurFactor
+                        )
+                    }
                 videoTrimManager.startTrim(
                     videoUri,
                     VideoConfigModel(startTime, endTime, splitTime, format, quality),
-                    VideoCanvasModel(targetWidth, targetHeight),
-                    Dimension(videoWidth, videoHeight),
-                    blurFactor
+                    blurModel
                 )
                 Result.success()
             } catch (exception: Exception) {

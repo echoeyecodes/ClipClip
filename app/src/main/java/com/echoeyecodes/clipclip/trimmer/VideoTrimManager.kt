@@ -12,6 +12,7 @@ import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.arthenica.ffmpegkit.ReturnCode
 import com.echoeyecodes.clipclip.R
 import com.echoeyecodes.clipclip.callbacks.VideoTrimCallback
+import com.echoeyecodes.clipclip.models.VideoBlurModel
 import com.echoeyecodes.clipclip.models.VideoCanvasModel
 import com.echoeyecodes.clipclip.models.VideoConfigModel
 import com.echoeyecodes.clipclip.utils.*
@@ -43,9 +44,7 @@ class VideoTrimManager(private val context: Context) {
     suspend fun startTrim(
         videoUri: String,
         configModel: VideoConfigModel,
-        videoCanvasModel: VideoCanvasModel,
-        dimension: Dimension,
-        blurFactor: Int
+        blurModel: VideoBlurModel?
     ) {
         resetTerminate()
         val count = configModel.getSplitCount()
@@ -68,12 +67,21 @@ class VideoTrimManager(private val context: Context) {
                 configModel.format.extension
             )?.let {
                 uris.add(it)
-                val ffmpegCommand = FFMPEGCommand.Builder().inputUri(context, videoUri.toUri())
-                    .outputUri(context, it)
-                    .format(configModel.format)
-                    .setCanvas(videoCanvasModel, dimension, blurFactor)
-                    .trim(start, splitTime)
-                    .build()
+                val ffmpegCommandBuilder =
+                    FFMPEGCommand.Builder().inputUri(context, videoUri.toUri())
+                        .outputUri(context, it)
+                        .format(configModel.format)
+                        .quality(configModel.quality)
+                        .trim(start, splitTime)
+
+                if (blurModel != null) {
+                    ffmpegCommandBuilder.setCanvas(
+                        blurModel.videoCanvasModel,
+                        blurModel.dimension,
+                        blurModel.blurFactor
+                    )
+                }
+                val ffmpegCommand = ffmpegCommandBuilder.build()
                 executeVideoEdit(ffmpegCommand.command)
             }
         }

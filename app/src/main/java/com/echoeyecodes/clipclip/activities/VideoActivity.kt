@@ -340,6 +340,9 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             putLong("splitTime", viewModel.splitTime)
             putString("quality", quality.qName)
             putString("format", format.extension)
+
+            //blur config
+            putBoolean("applyBlurFilter", viewModel.shouldApplyBlurFilter())
             putFloat("targetWidth", selectedDimension.width)
             putFloat("targetHeight", selectedDimension.height)
             putFloat("videoWidth", dimension.width)

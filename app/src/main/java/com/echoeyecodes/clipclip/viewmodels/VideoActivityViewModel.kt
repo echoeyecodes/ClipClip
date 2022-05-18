@@ -149,4 +149,8 @@ class VideoActivityViewModel(val uri: String, application: Application) :
         return startTime
     }
 
+    fun shouldApplyBlurFilter(): Boolean {
+        return image.value != null
+    }
+
 }
