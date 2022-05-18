@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.work.*
@@ -175,10 +176,11 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
 
     private fun showVideoCanvasFragment() {
         val fragment = getVideoCanvasFragment() ?: initVideoCanvasFragment()
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragment_container_view, fragment, VideoCanvasFragment.TAG)
-        transaction.addToBackStack(VideoCanvasFragment.TAG)
-        transaction.commitAllowingStateLoss()
+        supportFragmentManager.commit(true) {
+            setCustomAnimations(R.anim.slide_in, R.anim.slide_out, R.anim.fade_in, R.anim.fade_out)
+            replace(R.id.fragment_container_view, fragment, VideoCanvasFragment.TAG)
+            addToBackStack(VideoCanvasFragment.TAG)
+        }
     }
 
     private fun initFFMPEGListener() {
