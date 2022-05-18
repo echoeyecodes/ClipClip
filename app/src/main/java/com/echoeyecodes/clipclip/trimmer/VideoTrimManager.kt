@@ -12,6 +12,7 @@ import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.arthenica.ffmpegkit.ReturnCode
 import com.echoeyecodes.clipclip.R
 import com.echoeyecodes.clipclip.callbacks.VideoTrimCallback
+import com.echoeyecodes.clipclip.models.VideoCanvasModel
 import com.echoeyecodes.clipclip.models.VideoConfigModel
 import com.echoeyecodes.clipclip.utils.*
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +40,7 @@ class VideoTrimManager(private val context: Context) {
         shouldTerminate = false
     }
 
-    suspend fun startTrim(videoUri: String, configModel: VideoConfigModel) {
+    suspend fun startTrim(videoUri: String, configModel: VideoConfigModel, videoCanvasModel: VideoCanvasModel, dimension: Dimension) {
         resetTerminate()
         val count = configModel.getSplitCount()
         val uris = ArrayList<Uri>()
@@ -64,7 +65,7 @@ class VideoTrimManager(private val context: Context) {
                 val ffmpegCommand = FFMPEGCommand.Builder().inputUri(context, videoUri.toUri())
                     .outputUri(context, it)
                     .format(configModel.format)
-                    .quality(configModel.quality)
+                    .setCanvas(videoCanvasModel, dimension)
                     .trim(start, splitTime)
                     .build()
                 executeVideoEdit(ffmpegCommand.command)

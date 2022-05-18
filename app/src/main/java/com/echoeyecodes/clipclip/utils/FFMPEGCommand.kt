@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import com.arthenica.ffmpegkit.FFmpegKitConfig
+import com.echoeyecodes.clipclip.models.VideoCanvasModel
 
 class FFMPEGCommand private constructor(val command: String) {
 
@@ -13,6 +14,7 @@ class FFMPEGCommand private constructor(val command: String) {
         private var format: String = ""
         private var outputUri: String? = null
         private var trim: String = ""
+        private var filter: String = ""
 
         fun init(context: Context, inputUri: Uri, outputUri: Uri): Builder {
             inputUri(context, inputUri)
@@ -41,6 +43,22 @@ class FFMPEGCommand private constructor(val command: String) {
                 "-vcodec libx264"
             }
             this.format = format
+            return this
+        }
+
+        fun setCanvas(
+            canvasModel: VideoCanvasModel,
+            videoDimension: Dimension
+        ): Builder {
+            val desRatio = canvasModel.width / canvasModel.height
+            val srcRatio = videoDimension.width / videoDimension.height
+            val canvasCrop = if (desRatio > srcRatio) {
+                "[copy]scale=ih*${canvasModel.width}/${canvasModel.height}:-1,crop=h=iw*${canvasModel.height}/${canvasModel.width}"
+            } else {
+                "[copy]scale=-1:iw/(${canvasModel.width}/${canvasModel.height}),crop=w=ih/(${canvasModel.height}/${canvasModel.width})"
+            }
+            this.filter =
+                "-vf split=2[original][copy];$canvasCrop,boxblur=luma_radius=min(h\\,w)/20:luma_power=1:chroma_radius=min(cw\\,ch)/20:chroma_power=1[blurred];[blurred][original]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2"
             return this
         }
 
@@ -76,7 +94,8 @@ class FFMPEGCommand private constructor(val command: String) {
             if (inputUri == null || outputUri == null) {
                 throw Exception("Input/Output Uri must be initialized")
             }
-            val command = "$trim -i $inputUri $format $scale $outputUri"
+            val command = "$trim -i $inputUri $format $filter $outputUri"
+            AndroidUtilities.log(command)
             return FFMPEGCommand(command)
         }
     }

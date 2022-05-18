@@ -10,9 +10,11 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.echoeyecodes.clipclip.R
 import com.echoeyecodes.clipclip.activities.VideoActivity
+import com.echoeyecodes.clipclip.models.VideoCanvasModel
 import com.echoeyecodes.clipclip.models.VideoConfigModel
 import com.echoeyecodes.clipclip.receivers.VideoTrimBroadcastReceiver
 import com.echoeyecodes.clipclip.trimmer.VideoTrimManager
+import com.echoeyecodes.clipclip.utils.Dimension
 import com.echoeyecodes.clipclip.utils.VideoFormat
 import com.echoeyecodes.clipclip.utils.toVideoQuality
 import kotlinx.coroutines.*
@@ -61,13 +63,19 @@ class VideoTrimWorkManager(context: Context, workerParams: WorkerParameters) :
                 val endTime = inputData.getLong("endTime", 0L)
                 val splitTime = inputData.getLong("splitTime", 0L)
                 val _format = inputData.getString("format")
+                val targetWidth = inputData.getFloat("targetWidth", 0f)
+                val targetHeight = inputData.getFloat("targetHeight", 0f)
+                val videoWidth = inputData.getFloat("videoWidth", 0f)
+                val videoHeight = inputData.getFloat("videoHeight", 0f)
                 val quality = (inputData.getString("quality") ?: "normal").toVideoQuality()
                 val format = if (_format == ".mp3") {
                     VideoFormat.MP3
                 } else VideoFormat.MP4
                 videoTrimManager.startTrim(
                     videoUri,
-                    VideoConfigModel(startTime, endTime, splitTime, format, quality)
+                    VideoConfigModel(startTime, endTime, splitTime, format, quality),
+                    VideoCanvasModel(targetWidth, targetHeight),
+                    Dimension(videoWidth, videoHeight)
                 )
                 Result.success()
             } catch (exception: Exception) {

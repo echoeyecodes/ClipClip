@@ -1,5 +1,6 @@
 package com.echoeyecodes.clipclip.activities
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -323,9 +324,14 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         videoSelectionView.updateProgressMarkerPosition(viewModel.getProgressMarkerPosition(value))
     }
 
+    @SuppressLint("RestrictedApi")
     override fun onFinish(splitTime: Long, quality: VideoQuality, format: VideoFormat) {
         viewModel.splitTime = splitTime
         AndroidUtilities.dismissFragment(videoConfigurationDialogFragment)
+        val videoSize = player?.videoSize!!
+        val selectedDimension = viewModel.getSelectedDimensions()
+        val dimension = Dimension(videoSize.width.toFloat(), videoSize.height.toFloat())
+
         val workData = Data.Builder().apply {
             putString("videoUri", viewModel.uri)
             putLong("startTime", viewModel.getStartTime())
@@ -333,6 +339,10 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             putLong("splitTime", viewModel.splitTime)
             putString("quality", quality.qName)
             putString("format", format.extension)
+            putFloat("targetWidth", selectedDimension.width)
+            putFloat("targetHeight", selectedDimension.height)
+            putFloat("videoWidth", dimension.width)
+            putFloat("videoHeight", dimension.height)
         }.build()
         val workRequest = OneTimeWorkRequestBuilder<VideoTrimWorkManager>()
             .addTag(VideoTrimWorkManager.TAG).setInputData(workData)

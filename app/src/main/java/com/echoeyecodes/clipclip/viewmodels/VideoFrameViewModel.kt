@@ -28,6 +28,10 @@ abstract class VideoFrameViewModel(videoCanvasModel: VideoCanvasModel?, applicat
         return selectedDimensionsLiveData
     }
 
+    fun getSelectedDimensions(): VideoCanvasModel {
+        return selectedDimensionsLiveData.value ?: VideoCanvasModel(0.0f, 0.0f)
+    }
+
     fun setSelectedDimension(dimension: VideoCanvasModel) {
         selectedDimensionsLiveData.value = dimension
     }
