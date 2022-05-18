@@ -6,61 +6,69 @@
     android:layout_height="wrap_content"
     android:layout_alignParentBottom="true"
     android:background="@color/neo_black"
-    android:gravity="center"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     tools:showIn="@layout/activity_video_selection">
 
-    <LinearLayout
-        android:id="@+id/canvas_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="10dp">
-
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="5dp"
-            android:background="@null"
-            android:clickable="false"
-            android:focusable="false"
-            android:src="@drawable/ic_baseline_aspect_ratio_24"
-            app:tint="@color/white" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Canvas"
-            android:textColor="@color/white" />
-    </LinearLayout>
+    <include layout="@layout/layout_divider" />
 
     <LinearLayout
-        android:id="@+id/time_btn"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackgroundBorderless"
         android:gravity="center"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:orientation="horizontal">
 
-        <ImageButton
+        <LinearLayout
+            android:id="@+id/canvas_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="5dp"
-            android:background="@null"
-            android:clickable="false"
-            android:focusable="false"
-            android:src="@drawable/ic_baseline_av_timer_24"
-            app:tint="@color/white" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:gravity="center"
-            android:text="Scrubber"
-            android:textColor="@color/white" />
-    </LinearLayout>
+            android:orientation="vertical"
+            android:padding="10dp">
 
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="5dp"
+                android:background="@null"
+                android:clickable="false"
+                android:focusable="false"
+                android:src="@drawable/ic_baseline_aspect_ratio_24"
+                app:tint="@color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Canvas"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/time_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="5dp"
+                android:background="@null"
+                android:clickable="false"
+                android:focusable="false"
+                android:src="@drawable/ic_baseline_av_timer_24"
+                app:tint="@color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Scrubber"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+    </LinearLayout>
 </LinearLayout>

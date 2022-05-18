@@ -15,7 +15,7 @@
         android:id="@+id/player_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/seek_bar"
+        android:layout_above="@id/divider"
         android:layout_below="@id/toolbar"
         android:background="@color/neo_black">
 
@@ -44,16 +44,26 @@
             android:src="@drawable/ic_baseline_play_circle_filled_24" />
     </FrameLayout>
 
+    <include
+        android:id="@+id/divider"
+        layout="@layout/layout_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@id/seek_bar" />
+
     <SeekBar
         android:id="@+id/seek_bar"
-        android:layout_width="200dp"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_above="@id/recycler_view"
         android:layout_centerHorizontal="true"
-        android:layout_marginVertical="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
         android:max="100"
         android:min="1"
-        android:progress="50" />
+        android:progress="50"
+        android:progressTint="@color/white"
+        android:thumbTint="@color/white" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
