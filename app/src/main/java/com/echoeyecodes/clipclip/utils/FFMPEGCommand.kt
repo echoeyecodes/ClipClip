@@ -78,7 +78,7 @@ class FFMPEGCommand private constructor(val command: String) {
                     "scale=trunc(iw/4)*2:trunc(ih/4)*2"
                 }
                 else -> {
-                    ""
+                    "scale=iw:ih"
                 }
             }
             this.scaleFilter = scale
