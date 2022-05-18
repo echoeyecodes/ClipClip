@@ -67,6 +67,7 @@ class VideoTrimWorkManager(context: Context, workerParams: WorkerParameters) :
                 val targetHeight = inputData.getFloat("targetHeight", 0f)
                 val videoWidth = inputData.getFloat("videoWidth", 0f)
                 val videoHeight = inputData.getFloat("videoHeight", 0f)
+                val blurFactor = inputData.getInt("blurFactor", 0)
                 val quality = (inputData.getString("quality") ?: "normal").toVideoQuality()
                 val format = if (_format == ".mp3") {
                     VideoFormat.MP3
@@ -75,7 +76,8 @@ class VideoTrimWorkManager(context: Context, workerParams: WorkerParameters) :
                     videoUri,
                     VideoConfigModel(startTime, endTime, splitTime, format, quality),
                     VideoCanvasModel(targetWidth, targetHeight),
-                    Dimension(videoWidth, videoHeight)
+                    Dimension(videoWidth, videoHeight),
+                    blurFactor
                 )
                 Result.success()
             } catch (exception: Exception) {

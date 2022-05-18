@@ -48,7 +48,8 @@ class FFMPEGCommand private constructor(val command: String) {
 
         fun setCanvas(
             canvasModel: VideoCanvasModel,
-            videoDimension: Dimension
+            videoDimension: Dimension,
+            blurFactor: Int
         ): Builder {
             val desRatio = canvasModel.width / canvasModel.height
             val srcRatio = videoDimension.width / videoDimension.height
@@ -58,7 +59,7 @@ class FFMPEGCommand private constructor(val command: String) {
                 "[copy]scale=-1:iw/(${canvasModel.width}/${canvasModel.height}),crop=w=ih/(${canvasModel.height}/${canvasModel.width})"
             }
             this.filter =
-                "-vf split=2[original][copy];$canvasCrop,gblur=sigma=20[blurred];[blurred][original]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2"
+                "-vf split=2[original][copy];$canvasCrop,gblur=sigma=$blurFactor[blurred];[blurred][original]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2"
             return this
         }
 

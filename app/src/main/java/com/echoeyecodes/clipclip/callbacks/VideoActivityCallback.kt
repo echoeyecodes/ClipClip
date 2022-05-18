@@ -9,7 +9,7 @@ interface VideoActivityCallback {
     fun registerVideoActivityCallback(videoPlayerCallback: VideoPlayerCallback)
     fun removeVideoActivityCallback(videoPlayerCallback: VideoPlayerCallback)
     fun closeFragment()
-    fun setVideoBackground(videoCanvasModel: VideoCanvasModel)
+    fun setVideoFrameProperties(videoCanvasModel: VideoCanvasModel, blurFactor: Int)
     fun onBlurSeekStarted()
     fun onBlurSeekEnded()
 }

@@ -57,13 +57,15 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
         doneBtn = binding.toolbar.doneBtn
         seekBar = binding.seekBar
 
+        val blurFactor = arguments?.getInt("blurFactor", 30) ?: 30
         val videoCanvasModel = arguments?.getSerializable("video-canvas") as VideoCanvasModel?
-        val viewModelFactory = VideoCanvasViewModelFactory(videoCanvasModel, requireContext())
+        val viewModelFactory =
+            VideoCanvasViewModelFactory(videoCanvasModel, blurFactor, requireContext())
         viewModel = ViewModelProvider(this, viewModelFactory)[VideoCanvasViewModel::class.java]
         seekBar.progress = viewModel.blurFactor
 
         closeBtn.setOnClickListener { videoActivityCallback?.closeFragment() }
-        doneBtn.setOnClickListener { setVideoBackground() }
+        doneBtn.setOnClickListener { setVideoFrameProperties() }
         seekBar.setOnSeekBarChangeListener(this)
         return binding.root
     }
@@ -132,8 +134,11 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
         }
     }
 
-    private fun setVideoBackground() {
-        videoActivityCallback?.setVideoBackground(viewModel.getSelectedDimensionsLiveData().value!!)
+    private fun setVideoFrameProperties() {
+        videoActivityCallback?.setVideoFrameProperties(
+            viewModel.getSelectedDimensionsLiveData().value!!,
+            viewModel.blurFactor
+        )
     }
 
     override fun onCanvasItemSelected(model: VideoCanvasModel) {

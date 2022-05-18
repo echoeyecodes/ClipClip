@@ -40,7 +40,13 @@ class VideoTrimManager(private val context: Context) {
         shouldTerminate = false
     }
 
-    suspend fun startTrim(videoUri: String, configModel: VideoConfigModel, videoCanvasModel: VideoCanvasModel, dimension: Dimension) {
+    suspend fun startTrim(
+        videoUri: String,
+        configModel: VideoConfigModel,
+        videoCanvasModel: VideoCanvasModel,
+        dimension: Dimension,
+        blurFactor: Int
+    ) {
         resetTerminate()
         val count = configModel.getSplitCount()
         val uris = ArrayList<Uri>()
@@ -65,7 +71,7 @@ class VideoTrimManager(private val context: Context) {
                 val ffmpegCommand = FFMPEGCommand.Builder().inputUri(context, videoUri.toUri())
                     .outputUri(context, it)
                     .format(configModel.format)
-                    .setCanvas(videoCanvasModel, dimension)
+                    .setCanvas(videoCanvasModel, dimension, blurFactor)
                     .trim(start, splitTime)
                     .build()
                 executeVideoEdit(ffmpegCommand.command)

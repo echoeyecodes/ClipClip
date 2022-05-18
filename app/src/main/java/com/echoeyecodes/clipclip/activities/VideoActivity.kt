@@ -158,6 +158,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         return VideoCanvasFragment().apply {
             arguments = Bundle().apply {
                 putSerializable("video-canvas", viewModel.getSelectedDimensionsLiveData().value)
+                putInt("blurFactor", viewModel.blurFactor)
             }
         }
     }
@@ -343,6 +344,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
             putFloat("targetHeight", selectedDimension.height)
             putFloat("videoWidth", dimension.width)
             putFloat("videoHeight", dimension.height)
+            putInt("blurFactor", viewModel.blurFactor)
         }.build()
         val workRequest = OneTimeWorkRequestBuilder<VideoTrimWorkManager>()
             .addTag(VideoTrimWorkManager.TAG).setInputData(workData)
@@ -404,8 +406,9 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         }
     }
 
-    override fun setVideoBackground(videoCanvasModel: VideoCanvasModel) {
+    override fun setVideoFrameProperties(videoCanvasModel: VideoCanvasModel, blurFactor: Int) {
         viewModel.setSelectedDimension(videoCanvasModel)
+        viewModel.blurFactor = blurFactor
         closeFragment()
     }
 

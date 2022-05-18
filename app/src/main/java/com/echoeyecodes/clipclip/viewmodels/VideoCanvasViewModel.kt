@@ -8,6 +8,7 @@ import org.opencv.android.OpenCVLoader
 
 class VideoCanvasViewModelFactory(
     private val videoCanvasModel: VideoCanvasModel?,
+    private val blurFactor: Int,
     private val context: Context
 ) :
     ViewModelProvider.Factory {
@@ -15,6 +16,7 @@ class VideoCanvasViewModelFactory(
         if (modelClass.isAssignableFrom(VideoCanvasViewModel::class.java)) {
             return VideoCanvasViewModel(
                 videoCanvasModel,
+                blurFactor,
                 context.applicationContext as Application
             ) as T
         }
@@ -23,11 +25,16 @@ class VideoCanvasViewModelFactory(
 }
 
 
-class VideoCanvasViewModel(videoCanvasModel: VideoCanvasModel?, application: Application) :
+class VideoCanvasViewModel(
+    videoCanvasModel: VideoCanvasModel?,
+    bFactor: Int,
+    application: Application
+) :
     VideoFrameViewModel(videoCanvasModel, application) {
     val videoDimensions: LiveData<List<VideoCanvasModel>>
 
     init {
+        blurFactor = bFactor
         videoDimensions = Transformations.map(selectedDimensionsLiveData) {
             initVideoCanvasDimensions(it)
         }
