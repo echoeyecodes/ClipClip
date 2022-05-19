@@ -8,7 +8,6 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import androidx.lifecycle.*
 import com.echoeyecodes.clipclip.utils.*
-import org.opencv.android.OpenCVLoader
 import kotlin.math.max
 
 class VideoActivityViewModelFactory(private val uri: String, private val context: Context) :
@@ -34,7 +33,6 @@ class VideoActivityViewModel(val uri: String, application: Application) :
     var splitTime = 1L
 
     init {
-        OpenCVLoader.initDebug()
         duration = getVideoDuration(Uri.parse(uri))
         endTime = duration
         setVideoTimestamps(0f, 1f)
