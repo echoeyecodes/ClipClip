@@ -354,7 +354,7 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
                 viewModel.getStartTime(),
                 viewModel.getEndTime(),
                 viewModel.splitTime,
-                quality.name,
+                quality.qName,
                 format.extension
             )
 
