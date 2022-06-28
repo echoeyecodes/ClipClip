@@ -68,19 +68,11 @@ class VideoTrimManager(private val context: Context) {
             )?.let {
                 uris.add(it)
                 val ffmpegCommandBuilder =
-                    FFMPEGCommand.Builder().inputUri(context, videoUri.toUri())
-                        .outputUri(context, it)
+                    FFMPEGCommand.Builder()
+                        .inputUri(context, videoUri.toUri(), it, start, splitTime)
                         .format(configModel.format)
-                        .quality(configModel.quality)
-                        .trim(start, splitTime)
+                        .setQuality(configModel.quality).setBlurConfig(blurModel)
 
-                if (blurModel != null) {
-                    ffmpegCommandBuilder.setCanvas(
-                        blurModel.videoCanvasModel,
-                        blurModel.dimension,
-                        blurModel.blurFactor
-                    )
-                }
                 val ffmpegCommand = ffmpegCommandBuilder.build()
                 executeVideoEdit(ffmpegCommand.command)
             }
