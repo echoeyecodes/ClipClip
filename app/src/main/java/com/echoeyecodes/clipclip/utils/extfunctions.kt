@@ -3,17 +3,12 @@ package com.echoeyecodes.clipclip.utils
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.util.TypedValue
-import androidx.lifecycle.viewModelScope
 import com.echoeyecodes.clipclip.models.VideoCanvasModel
 import com.echoeyecodes.clipclip.models.VideoEditConfigModel
 import com.google.gson.Gson
+import io.alterac.blurkit.BlurKit
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.opencv.android.Utils
-import org.opencv.core.Mat
-import org.opencv.core.Size
-import org.opencv.imgproc.Imgproc
 import kotlin.math.max
 
 
@@ -155,31 +150,25 @@ suspend fun Bitmap.blurFrame(selectedDimension: VideoCanvasModel, blurFactor: In
         } else {
             val bitmap = this@blurFrame
 
-            val mat = Mat()
-            Utils.bitmapToMat(bitmap, mat)
             val dimension = Pair(selectedDimension.width, selectedDimension.height)
-            val rows = mat.rows().toFloat()
-            val cols = mat.cols().toFloat()
+            val rows = bitmap.height.toFloat()
+            val cols = bitmap.width.toFloat()
 
             val newDimension =
                 convertToAspectRatio(Pair(dimension.first, dimension.second), Pair(cols, rows))
             val height = newDimension.second
             val width = newDimension.first
 
-            val rowMid = rows / 2
-            val colMid = cols / 2
+            val rowMid = height / 2
+            val colMid = width / 2
 
             val rowStart = (rowMid - (height / 2)).toInt()
             val rowEnd = (rowMid + (height / 2)).toInt()
             val colStart = (colMid - (width / 2)).toInt()
             val colEnd = (colMid + (width / 2)).toInt()
 
-            val submat = mat.submat(rowStart, rowEnd, colStart, colEnd)
-            Imgproc.blur(mat, mat, Size(blurFactor.toDouble(), blurFactor.toDouble()))
-
-            val newBitmap =
-                Bitmap.createBitmap(submat.width(), submat.height(), Bitmap.Config.ARGB_8888)
-            Utils.matToBitmap(submat, newBitmap)
+            val croppedBitmap = Bitmap.createBitmap(bitmap, colStart, rowStart, colEnd, rowEnd)
+            val newBitmap = BlurKit.getInstance().blur(croppedBitmap, blurFactor)
             newBitmap
         }
     }
