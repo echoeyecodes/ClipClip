@@ -59,9 +59,9 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="10dp"
-        android:max="100"
+        android:max="25"
         android:min="1"
-        android:progress="50"
+        android:progress="10"
         android:progressTint="@color/white"
         android:thumbTint="@color/white" />
 

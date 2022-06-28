@@ -86,7 +86,7 @@ class FFMPEGCommand private constructor(val command: String) {
                     blurConfig!!.videoCanvasModel.height
                 )
                 val videoDimension = blurConfig!!.dimension
-                val blurFactor = blurConfig!!.blurFactor
+                val blurFactor = blurConfig!!.blurFactor * 2
 
                 val desRatio = targetDimension.width / targetDimension.height
                 val srcRatio = videoDimension.width / videoDimension.height
