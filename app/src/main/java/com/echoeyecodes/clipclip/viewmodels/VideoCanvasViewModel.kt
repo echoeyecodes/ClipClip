@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.*
 import com.echoeyecodes.clipclip.models.VideoCanvasModel
-import org.opencv.osgi.OpenCVNativeLoader
 
 class VideoCanvasViewModelFactory(
     private val videoCanvasModel: VideoCanvasModel?,
@@ -34,7 +33,6 @@ class VideoCanvasViewModel(
     val videoDimensions: LiveData<List<VideoCanvasModel>>
 
     init {
-        OpenCVNativeLoader().init()
         blurFactor = bFactor
         videoDimensions = Transformations.map(selectedDimensionsLiveData) {
             initVideoCanvasDimensions(it)

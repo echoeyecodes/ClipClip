@@ -42,28 +42,6 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    sourceSets {
-        main {
-            jni {
-                srcDirs 'src\\main\\jni', 'src\\main\\jniLibs'
-            }
-        }
-    }
-}
-
-configurations {
-    javacpp
-}
-
-task javacppExtract(type: Copy) {
-    dependsOn configurations.javacpp
-
-    from { configurations.javacpp.collect { zipTree(it) } }
-    include "lib/**"
-    into "$buildDir/javacpp/"
-    android.sourceSets.main.jniLibs.srcDirs += ["$buildDir/javacpp/lib/"]
-
-    tasks.getByName('preBuild').dependsOn javacppExtract
 }
 
 dependencies {
