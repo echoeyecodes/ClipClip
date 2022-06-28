@@ -25,7 +25,10 @@ import com.echoeyecodes.clipclip.fragments.dialogfragments.ProgressDialogFragmen
 import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoConfigurationDialogFragment
 import com.echoeyecodes.clipclip.fragments.dialogfragments.VideoTimestampDialogFragment
 import com.echoeyecodes.clipclip.fragments.videofragments.VideoCanvasFragment
+import com.echoeyecodes.clipclip.models.VideoCanvasConfigModel
 import com.echoeyecodes.clipclip.models.VideoCanvasModel
+import com.echoeyecodes.clipclip.models.VideoEditConfigModel
+import com.echoeyecodes.clipclip.models.VideoTrimConfigModel
 import com.echoeyecodes.clipclip.trimmer.VideoTrimManager
 import com.echoeyecodes.clipclip.utils.*
 import com.echoeyecodes.clipclip.viewmodels.VideoActivityViewModel
@@ -346,21 +349,30 @@ class VideoActivity : AppCompatActivity(), VideoSelectionCallback, Player.Listen
         val dimension = Dimension(videoSize.width.toFloat(), videoSize.height.toFloat())
 
         val workData = Data.Builder().apply {
-            putString("videoUri", viewModel.uri)
-            putLong("startTime", viewModel.getStartTime())
-            putLong("endTime", viewModel.getEndTime())
-            putLong("splitTime", viewModel.splitTime)
-            putString("quality", quality.qName)
-            putString("format", format.extension)
+            val videoTrimConfig = VideoTrimConfigModel(
+                viewModel.uri,
+                viewModel.getStartTime(),
+                viewModel.getEndTime(),
+                viewModel.splitTime,
+                quality.name,
+                format.extension
+            )
 
-            //blur config
-            putBoolean("applyBlurFilter", viewModel.shouldApplyBlurFilter())
-            putFloat("targetWidth", selectedDimension.width)
-            putFloat("targetHeight", selectedDimension.height)
-            putFloat("videoWidth", dimension.width)
-            putFloat("videoHeight", dimension.height)
-            putInt("blurFactor", viewModel.blurFactor)
+            val canvasConfig: VideoCanvasConfigModel? = if (viewModel.shouldApplyBlurFilter()) {
+                VideoCanvasConfigModel(
+                    selectedDimension.width,
+                    selectedDimension.height,
+                    dimension.width,
+                    dimension.height,
+                    viewModel.blurFactor
+                )
+            } else null
+
+            val editConfigModel =
+                VideoEditConfigModel(trimConfig = videoTrimConfig, canvasConfig = canvasConfig)
+            putString("config", editConfigModel.serialize())
         }.build()
+
         val workRequest = OneTimeWorkRequestBuilder<VideoTrimWorkManager>()
             .addTag(VideoTrimWorkManager.TAG).setInputData(workData)
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST).build()

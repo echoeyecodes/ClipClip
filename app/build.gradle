@@ -121,6 +121,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
+    //gson
+    implementation 'com.google.code.gson:gson:2.9.0'
+
 //    implementation group: 'org.bytedeco', name: 'javacv', version: '1.5.7'
 //    implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.19-1.5.7', classifier: 'android-arm'
 //    implementation group: 'org.bytedeco', name: 'opencv', version: '4.5.5-1.5.7', classifier: 'android-arm'

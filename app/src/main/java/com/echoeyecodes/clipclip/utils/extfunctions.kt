@@ -5,6 +5,8 @@ import android.graphics.Bitmap
 import android.util.TypedValue
 import androidx.lifecycle.viewModelScope
 import com.echoeyecodes.clipclip.models.VideoCanvasModel
+import com.echoeyecodes.clipclip.models.VideoEditConfigModel
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -181,4 +183,14 @@ suspend fun Bitmap.blurFrame(selectedDimension: VideoCanvasModel, blurFactor: In
             newBitmap
         }
     }
+}
+
+fun VideoEditConfigModel.serialize(): String {
+    val gson = Gson()
+    return gson.toJson(this)
+}
+
+fun String.toVideoEditConfigModel(): VideoEditConfigModel {
+    val gson = Gson()
+    return gson.fromJson(this, VideoEditConfigModel::class.java)
 }
