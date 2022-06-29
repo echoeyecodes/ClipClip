@@ -12,6 +12,8 @@ import com.arthenica.ffmpegkit.FFmpegKitConfig
 import com.arthenica.ffmpegkit.ReturnCode
 import com.echoeyecodes.clipclip.R
 import com.echoeyecodes.clipclip.callbacks.VideoTrimCallback
+import com.echoeyecodes.clipclip.models.VideoBlurModel
+import com.echoeyecodes.clipclip.models.VideoCanvasModel
 import com.echoeyecodes.clipclip.models.VideoConfigModel
 import com.echoeyecodes.clipclip.utils.*
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +32,6 @@ class VideoTrimManager(private val context: Context) {
         private var instance: VideoTrimManager? = null
         fun getInstance(context: Context) = instance ?: synchronized(this) {
             val newInstance = VideoTrimManager(context)
-            AndroidUtilities.log((instance == null).toString())
             instance = newInstance
             return newInstance
         }
@@ -40,7 +41,11 @@ class VideoTrimManager(private val context: Context) {
         shouldTerminate = false
     }
 
-    suspend fun startTrim(videoUri: String, configModel: VideoConfigModel) {
+    suspend fun startTrim(
+        videoUri: String,
+        configModel: VideoConfigModel,
+        blurModel: VideoBlurModel?
+    ) {
         resetTerminate()
         val count = configModel.getSplitCount()
         val uris = ArrayList<Uri>()
@@ -62,12 +67,13 @@ class VideoTrimManager(private val context: Context) {
                 configModel.format.extension
             )?.let {
                 uris.add(it)
-                val ffmpegCommand = FFMPEGCommand.Builder().inputUri(context, videoUri.toUri())
-                    .outputUri(context, it)
-                    .format(configModel.format)
-                    .quality(configModel.quality)
-                    .trim(start, splitTime)
-                    .build()
+                val ffmpegCommandBuilder =
+                    FFMPEGCommand.Builder()
+                        .inputUri(context, videoUri.toUri(), it, start, splitTime)
+                        .format(configModel.format)
+                        .setQuality(configModel.quality).setBlurConfig(blurModel)
+
+                val ffmpegCommand = ffmpegCommandBuilder.build()
                 executeVideoEdit(ffmpegCommand.command)
             }
         }

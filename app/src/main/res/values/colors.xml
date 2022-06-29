@@ -47,4 +47,5 @@
     <color name="notification_unread_color">#0dde5246</color>
     <color name="inputBoxColorLight">#F2F3F5</color>
     <color name="inputBoxColorDark">#2C2F33</color>
+    <color name="canvas_item_background_color">#3d3d3d</color>
 </resources>

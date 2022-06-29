@@ -1,7 +1,14 @@
 package com.echoeyecodes.clipclip.utils
 
 import android.content.res.Resources
+import android.graphics.Bitmap
 import android.util.TypedValue
+import com.echoeyecodes.clipclip.models.VideoCanvasModel
+import com.echoeyecodes.clipclip.models.VideoEditConfigModel
+import com.google.gson.Gson
+import io.alterac.blurkit.BlurKit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlin.math.max
 
 
@@ -98,4 +105,81 @@ fun String.toVideoQuality(): VideoQuality {
         "high" -> VideoQuality.HIGH
         else -> VideoQuality.NORMAL
     }
+}
+
+fun Pair<Float, Float>.getDimensions(size: Float): Pair<Float, Float> {
+    val newDimension = if (this.first > this.second) {
+        val value = (this.second / this.first) * size
+        Pair(size, value)
+    } else {
+        val value = (this.first / this.second) * size
+        Pair(value, size)
+    }
+    return newDimension
+}
+
+fun convertToAspectRatio(
+    src: Pair<Float, Float>,
+    des: Pair<Float, Float>
+): Pair<Float, Float> {
+    val srcWidth = src.first
+    val srcHeight = src.second
+
+    val desWidth = des.first
+    val desHeight = des.second
+
+    val srcRatio = srcWidth / srcHeight
+    val desRatio = desWidth / desHeight
+
+    var finalWidth = desWidth
+    var finalHeight = desHeight
+
+    if (desRatio > srcRatio) {
+        finalWidth = finalHeight * srcRatio
+    } else {
+        finalHeight = finalWidth / srcRatio
+    }
+    return Pair(finalWidth, finalHeight)
+}
+
+
+suspend fun Bitmap.blurFrame(selectedDimension: VideoCanvasModel, blurFactor: Int): Bitmap? {
+    return withContext(Dispatchers.IO) {
+        if (selectedDimension.width == 0.0f && selectedDimension.height == 0.0f) {
+            null
+        } else {
+            val bitmap = this@blurFrame
+
+            val dimension = Pair(selectedDimension.width, selectedDimension.height)
+            val rows = bitmap.height.toFloat()
+            val cols = bitmap.width.toFloat()
+
+            val newDimension =
+                convertToAspectRatio(Pair(dimension.first, dimension.second), Pair(cols, rows))
+            val height = newDimension.second
+            val width = newDimension.first
+
+            val rowMid = height / 2
+            val colMid = width / 2
+
+            val rowStart = (rowMid - (height / 2)).toInt()
+            val rowEnd = (rowMid + (height / 2)).toInt()
+            val colStart = (colMid - (width / 2)).toInt()
+            val colEnd = (colMid + (width / 2)).toInt()
+
+            val croppedBitmap = Bitmap.createBitmap(bitmap, colStart, rowStart, colEnd, rowEnd)
+            val newBitmap = BlurKit.getInstance().blur(croppedBitmap, blurFactor)
+            newBitmap
+        }
+    }
+}
+
+fun VideoEditConfigModel.serialize(): String {
+    val gson = Gson()
+    return gson.toJson(this)
+}
+
+fun String.toVideoEditConfigModel(): VideoEditConfigModel {
+    val gson = Gson()
+    return gson.fromJson(this, VideoEditConfigModel::class.java)
 }

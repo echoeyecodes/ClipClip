@@ -7,9 +7,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import androidx.lifecycle.*
-import com.echoeyecodes.clipclip.utils.AndroidUtilities
-import com.echoeyecodes.clipclip.utils.toSeconds
-import com.echoeyecodes.clipclip.utils.withPrefix
+import com.echoeyecodes.clipclip.utils.*
 import kotlin.math.max
 
 class VideoActivityViewModelFactory(private val uri: String, private val context: Context) :
@@ -23,7 +21,7 @@ class VideoActivityViewModelFactory(private val uri: String, private val context
 }
 
 class VideoActivityViewModel(val uri: String, application: Application) :
-    AndroidViewModel(application) {
+    VideoFrameViewModel(null, application) {
     private val duration: Long
     var isPlaying = true
     private var startTime: Long = 0L
@@ -147,6 +145,10 @@ class VideoActivityViewModel(val uri: String, application: Application) :
 
     fun getStartTime(): Long {
         return startTime
+    }
+
+    fun shouldApplyBlurFilter(): Boolean {
+        return image.value != null
     }
 
 }

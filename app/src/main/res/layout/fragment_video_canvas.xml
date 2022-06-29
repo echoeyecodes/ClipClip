@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/neo_black"
+    android:clickable="true"
+    android:focusable="true">
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/video_selection_toolbar" />
+
+    <FrameLayout
+        android:id="@+id/player_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/divider"
+        android:layout_below="@id/toolbar"
+        android:background="@color/neo_black">
+
+        <com.echoeyecodes.clipclip.customviews.videoview.VideoFrameView
+            android:id="@+id/player_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="@color/neo_black">
+
+            <com.google.android.exoplayer2.ui.PlayerView
+                android:id="@+id/player_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:surface_type="texture_view"
+                app:use_controller="false" />
+
+        </com.echoeyecodes.clipclip.customviews.videoview.VideoFrameView>
+
+        <ImageButton
+            android:id="@+id/play_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_baseline_play_circle_filled_24" />
+    </FrameLayout>
+
+    <include
+        android:id="@+id/divider"
+        layout="@layout/layout_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@id/seek_bar" />
+
+    <SeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/recycler_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:max="25"
+        android:min="1"
+        android:progress="10"
+        android:progressTint="@color/white"
+        android:thumbTint="@color/white" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+</RelativeLayout>

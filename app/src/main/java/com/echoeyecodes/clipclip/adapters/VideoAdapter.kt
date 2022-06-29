@@ -37,7 +37,7 @@ class VideoAdapter(private val callback: VideoAdapterCallback) :
 
         fun bind(model: VideoModel) {
             model.videoUri?.let {
-                Glide.with(view).load(it).sizeMultiplier(0.5f).override(size)
+                Glide.with(view).load(it).override(size)
                     .into(imageView)
             }
             view.setOnClickListener { callback.onVideoSelected(model) }
