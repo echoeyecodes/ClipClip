@@ -7,7 +7,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.echoeyecodes.clipclip.models.VideoCanvasModel
+import com.echoeyecodes.clipclip.utils.DEFAULT_BLUR_FACTOR
 import com.echoeyecodes.clipclip.utils.blurFrame
+import io.alterac.blurkit.BlurKit
 import kotlinx.coroutines.launch
 
 
@@ -21,9 +23,13 @@ import kotlinx.coroutines.launch
 abstract class VideoFrameViewModel(videoCanvasModel: VideoCanvasModel?, application: Application) :
     AndroidViewModel(application) {
     val image = MutableLiveData<Bitmap?>()
-    var blurFactor = 30
+    var blurFactor = DEFAULT_BLUR_FACTOR
     protected var selectedDimensionsLiveData =
         MutableLiveData(videoCanvasModel ?: VideoCanvasModel(0.0f, 0.0f))
+
+    init {
+        BlurKit.init(application)
+    }
 
     fun blurFrame(bitmap: Bitmap) {
         viewModelScope.launch {

@@ -23,3 +23,4 @@ enum class VideoFormat(val extension: String) {
     MP4(".mp4"),
     MP3(".mp3")
 }
+const val DEFAULT_BLUR_FACTOR = 10

@@ -17,6 +17,7 @@ import com.echoeyecodes.clipclip.receivers.VideoTrimBroadcastReceiver
 import com.echoeyecodes.clipclip.trimmer.VideoTrimManager
 import com.echoeyecodes.clipclip.utils.Dimension
 import com.echoeyecodes.clipclip.utils.VideoFormat
+import com.echoeyecodes.clipclip.utils.toVideoEditConfigModel
 import com.echoeyecodes.clipclip.utils.toVideoQuality
 import kotlinx.coroutines.*
 import java.lang.Exception
@@ -59,39 +60,45 @@ class VideoTrimWorkManager(context: Context, workerParams: WorkerParameters) :
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
             try {
-                val videoUri = inputData.getString("videoUri")!!
-                val startTime = inputData.getLong("startTime", 0L)
-                val endTime = inputData.getLong("endTime", 0L)
-                val splitTime = inputData.getLong("splitTime", 0L)
-                val _format = inputData.getString("format")
-                val quality = (inputData.getString("quality") ?: "normal").toVideoQuality()
+                val videoEditConfigModel = inputData.getString("config")!!.toVideoEditConfigModel()
+                val canvasConfig = videoEditConfigModel.canvasConfig
+                val trimConfig = videoEditConfigModel.trimConfig
 
-                val shouldApplyBlurFilter = inputData.getBoolean("applyBlurFilter", false)
-                val targetWidth = inputData.getFloat("targetWidth", 0f)
-                val targetHeight = inputData.getFloat("targetHeight", 0f)
-                val videoWidth = inputData.getFloat("videoWidth", 0f)
-                val videoHeight = inputData.getFloat("videoHeight", 0f)
-                val blurFactor = inputData.getInt("blurFactor", 0)
+                val videoUri = trimConfig.uri
+                val startTime = trimConfig.startTime
+                val endTime = trimConfig.endTime
+                val splitTime = trimConfig.splitTime
+                val _format = trimConfig.format
+                val quality = trimConfig.quality.toVideoQuality()
 
                 val format = if (_format == ".mp3") {
                     VideoFormat.MP3
                 } else VideoFormat.MP4
 
-                val blurModel: VideoBlurModel? =
-                    if (format == VideoFormat.MP3 || !shouldApplyBlurFilter) {
+                if (format == VideoFormat.MP3 || canvasConfig == null) {
+                    videoTrimManager.startTrim(
+                        videoUri,
+                        VideoConfigModel(startTime, endTime, splitTime, format, quality),
                         null
-                    } else {
-                        VideoBlurModel(
-                            VideoCanvasModel(targetWidth, targetHeight),
-                            Dimension(videoWidth, videoHeight),
-                            blurFactor
-                        )
-                    }
-                videoTrimManager.startTrim(
-                    videoUri,
-                    VideoConfigModel(startTime, endTime, splitTime, format, quality),
-                    blurModel
-                )
+                    )
+                } else {
+                    val targetWidth = canvasConfig.targetWidth
+                    val targetHeight = canvasConfig.targetHeight
+                    val videoWidth = canvasConfig.videoWidth
+                    val videoHeight = canvasConfig.videoHeight
+                    val blurFactor = canvasConfig.blurFactor
+
+                    val blurModel = VideoBlurModel(
+                        VideoCanvasModel(targetWidth, targetHeight),
+                        Dimension(videoWidth, videoHeight),
+                        blurFactor
+                    )
+                    videoTrimManager.startTrim(
+                        videoUri,
+                        VideoConfigModel(startTime, endTime, splitTime, format, quality),
+                        blurModel
+                    )
+                }
                 Result.success()
             } catch (exception: Exception) {
                 Result.failure()

@@ -22,6 +22,7 @@ import com.echoeyecodes.clipclip.databinding.FragmentVideoCanvasBinding
 import com.echoeyecodes.clipclip.models.VideoCanvasModel
 import com.echoeyecodes.clipclip.utils.AndroidUtilities
 import com.echoeyecodes.clipclip.utils.CustomItemDecoration
+import com.echoeyecodes.clipclip.utils.DEFAULT_BLUR_FACTOR
 import com.echoeyecodes.clipclip.viewmodels.VideoCanvasViewModel
 import com.echoeyecodes.clipclip.viewmodels.VideoCanvasViewModelFactory
 import com.google.android.exoplayer2.Player
@@ -58,7 +59,7 @@ class VideoCanvasFragment : Fragment(), VideoPlayerCallback, VideoCanvasAdapterC
         doneBtn = binding.toolbar.doneBtn
         seekBar = binding.seekBar
 
-        val blurFactor = arguments?.getInt("blurFactor", 30) ?: 30
+        val blurFactor = arguments?.getInt("blurFactor", DEFAULT_BLUR_FACTOR) ?: DEFAULT_BLUR_FACTOR
         val videoCanvasModel = arguments?.getSerializable("video-canvas") as VideoCanvasModel?
         val viewModelFactory =
             VideoCanvasViewModelFactory(videoCanvasModel, blurFactor, requireContext())
